@@ -117,3 +117,8 @@ textarea {
         left: -100%;
     }
 }
+
+.box-shadow-stats {
+    -webkit-box-shadow: 0 0 10px #0038ff;
+    box-shadow: 0 0 10px #0038ff;
+}
