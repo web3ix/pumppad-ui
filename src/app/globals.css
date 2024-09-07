@@ -2,32 +2,118 @@
 @tailwind components;
 @tailwind utilities;
 
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
+@font-face {
+    font-family: CosmicVortex;
+    src: url("/fonts/CosmicVortex.ttf");
+}
+
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+    --foreground-rgb: 0, 0, 0;
+    --background-start-rgb: 214, 219, 220;
+    --background-end-rgb: 255, 255, 255;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+    :root {
+        --foreground-rgb: 255, 255, 255;
+        --background-start-rgb: 0, 0, 0;
+        --background-end-rgb: 0, 0, 0;
+    }
+}
+
+::-webkit-scrollbar {
+    width: 0.5px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #0038ff;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+    /* color: rgb(var(--foreground-rgb)); */
+    background-color: #000000;
+    color: #ffffff;
+    /* font-family: Inter; */
+    font-size: 14px;
+    font-family: "Inter", sans-serif;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+h1 {
+    font-family: CosmicVortex !important;
+}
+
+.font-vortex {
+    font-family: CosmicVortex !important;
+}
+
+input,
+textarea {
+    background-color: #000000;
+    border: 1px solid #ffffff;
+    width: 100%;
+    padding: 13px 10px;
+    border-radius: 10px;
+    font-size: 16px;
+}
+
+/* F1F5F9 */
+.primary-text-gradient {
+    background: linear-gradient(to bottom, #4338ca 24%, #ffffff 40%);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.border-gradient {
+    /* border: 1px solid #a9ace7; */
+    border: 1px solid #8a8edc66;
+    border-bottom: 1px solid #8a8edc66;
+}
+
+/* .primary-border {
+    border-top: 1px solid #a9ace7;
+
+    border-bottom: 1px solid rgba(138, 142, 220, 0.4);
+} */
+
+.launch-bg1 {
+    background-image: url("/bg/launch-bg1.png");
+    /* background-position: center; */
+    position: absolute;
+    height: 1000px;
+    left: 0;
+    right: 0;
+    top: -70px;
+    z-index: -999;
+}
+
+.launch-bg2 {
+    background-image: url("/bg/launch-bg2.png");
+    background-position: center;
+    position: absolute;
+    height: 1000px;
+    left: 0;
+    right: 0;
+    top: 700px;
+    z-index: -1;
+}
+
+.animate-marquee {
+    animation: marquee 5s linear infinite;
+}
+
+@keyframes marquee {
+    0% {
+        left: 0;
+    }
+    100% {
+        left: -100%;
+    }
 }
