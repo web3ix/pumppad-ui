@@ -13,7 +13,7 @@ export default function HighlightProject({ token }: { token?: IToken }) {
     if (!token) return <Skeleton h="490px" />;
 
     return (
-        <Link href={`/token/${token.token}`}>
+        <Link href={`/token/${token.token}`} passHref legacyBehavior>
             <div className="w-full flex flex-col md:flex-row p-6 gap-7 border-gradient rounded-2xl bg-[#000]">
                 <div className="cursor-pointer w-full pt-[125%] md:w-[280px] md:pt-[400px] relative">
                     <Image src={token.icon} alt="icon" fill sizes="any" />
