@@ -7,6 +7,7 @@ import Image from "next/image";
 import useConnect from "@/hooks/useConnect";
 import axios from "axios";
 import clsx from "clsx";
+import { sliceString } from "@/utils";
 
 export default function CreateToken() {
     const { publicKey, sendTransaction } = useWallet();
@@ -31,6 +32,14 @@ export default function CreateToken() {
     const [description, setDescription] = useState("");
     const [icon, setIcon] = useState<File | undefined>();
     const [banner, setBanner] = useState<File | undefined>();
+    const [link, setLink] = useState<{
+        website?: string;
+        twitter?: string;
+        telegram?: string;
+        discord?: string;
+        link1?: string;
+        link2?: string;
+    }>({});
 
     const [previewIcon, setPreviewIcon] = useState("");
     const [previewBanner, setPreviewBanner] = useState("");
@@ -62,6 +71,10 @@ export default function CreateToken() {
             formData.append("description", description);
             formData.append("icon", icon);
 
+            if (Object.keys(link)) {
+                formData.append("link", JSON.stringify(link));
+            }
+
             const res = await axios.post(
                 `${process.env.NEXT_PUBLIC_API}/bond/metadata`,
                 formData,
@@ -83,7 +96,7 @@ export default function CreateToken() {
                 maxRetries: 10,
             });
 
-            await connection.confirmTransaction(signature, "confirmed");
+            await connection.confirmTransaction(signature, "finalized");
 
             // alert(`Created successful. Tx hash: ${signature}`);
 
@@ -104,7 +117,32 @@ export default function CreateToken() {
             setSubmitting(false);
             alert(error?.message ?? error);
         }
-    }, [connection, publicKey, name, symbol]);
+    }, [
+        connection,
+        publicKey,
+        name,
+        symbol,
+        description,
+        icon,
+        banner,
+        Object.values(link),
+    ]);
+
+    const handleInputLink = useCallback(
+        (link: string) => {
+            try {
+                let url = prompt(
+                    `Enter ${["link1", "link2"].includes(link) ? "another" : link} link`
+                );
+
+                if (!url) return;
+                setLink((pre) => ({ ...pre, [link]: url }));
+            } catch (error) {}
+        },
+        [setLink]
+    );
+
+    console.log(link);
 
     return (
         <div className="px-[20px] flex flex-col items-stretch md:items-center gap-10 md:gap-20 relative mt-[60px] md:mt-20 mb-20">
@@ -371,20 +409,34 @@ export default function CreateToken() {
                         <div>
                             <label className="font-bold">Link</label>
                             <div className="grid grid-cols-1 md:grid-cols-3 mt-4 gap-2 md:gap-[30px]">
-                                <div className="cursor-pointer flex md:flex-col items-center justify-center py-[18px] md:py-10 md:px-16 bg-[#06050E] border border-[#ffffff1f] rounded-xl gap-1.5">
-                                    <div className="w-[24px] h-[24px] relative">
-                                        <Image
-                                            src="/icons/web.svg"
-                                            alt="web"
-                                            fill
-                                            sizes="any"
-                                        />
-                                    </div>
-                                    <div className="font-semibold md:text-[16px]">
-                                        Add Website
-                                    </div>
+                                <div
+                                    onClick={() => handleInputLink("website")}
+                                    className="md:min-h-[136px] cursor-pointer flex md:flex-col items-center justify-center py-[18px] md:py-10 md:px-16 bg-[#06050E] border border-[#ffffff1f] rounded-xl gap-1.5"
+                                >
+                                    {link.website ? (
+                                        <div className="line-clamp-1 md:w-[97px] overflow-hidden  font-semibold md:text-[16px] truncate text-center">
+                                            {link.website}
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className="w-[24px] h-[24px] relative">
+                                                <Image
+                                                    src="/icons/web.svg"
+                                                    alt="web"
+                                                    fill
+                                                    sizes="any"
+                                                />
+                                            </div>
+                                            <div className="font-semibold md:text-[16px]">
+                                                Add Website
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
-                                <div className="cursor-pointer flex md:flex-col items-center justify-center py-[18px] md:py-10 bg-[#06050E] border border-[#ffffff1f] rounded-xl gap-1.5">
+                                <div
+                                    onClick={() => handleInputLink("twitter")}
+                                    className="cursor-pointer flex md:flex-col items-center justify-center py-[18px] md:py-10 bg-[#06050E] border border-[#ffffff1f] rounded-xl gap-1.5"
+                                >
                                     <div className="w-[24px] h-[24px] relative">
                                         <Image
                                             src="/icons/twitter1.svg"
@@ -397,7 +449,10 @@ export default function CreateToken() {
                                         Add Twitter
                                     </div>
                                 </div>
-                                <div className="cursor-pointer flex md:flex-col items-center justify-center py-[18px] md:py-10 bg-[#06050E] border border-[#ffffff1f] rounded-xl gap-1.5">
+                                <div
+                                    onClick={() => handleInputLink("telegram")}
+                                    className="cursor-pointer flex md:flex-col items-center justify-center py-[18px] md:py-10 bg-[#06050E] border border-[#ffffff1f] rounded-xl gap-1.5"
+                                >
                                     <div className="w-[24px] h-[24px] relative">
                                         <Image
                                             src="/icons/telegram1.svg"
@@ -410,7 +465,10 @@ export default function CreateToken() {
                                         Add Telegram
                                     </div>
                                 </div>
-                                <div className="cursor-pointer flex md:flex-col items-center justify-center py-[18px] md:py-10 bg-[#06050E] border border-[#ffffff1f] rounded-xl gap-1.5">
+                                <div
+                                    onClick={() => handleInputLink("discord")}
+                                    className="cursor-pointer flex md:flex-col items-center justify-center py-[18px] md:py-10 bg-[#06050E] border border-[#ffffff1f] rounded-xl gap-1.5"
+                                >
                                     <div className="w-[24px] h-[24px] relative">
                                         <Image
                                             src="/icons/discord1.svg"
@@ -423,7 +481,10 @@ export default function CreateToken() {
                                         Add Discord
                                     </div>
                                 </div>
-                                <div className="cursor-pointer flex md:flex-col items-center justify-center py-[18px] md:py-10 bg-[#06050E] border border-[#ffffff1f] rounded-xl gap-1.5">
+                                <div
+                                    onClick={() => handleInputLink("link1")}
+                                    className="cursor-pointer flex md:flex-col items-center justify-center py-[18px] md:py-10 bg-[#06050E] border border-[#ffffff1f] rounded-xl gap-1.5"
+                                >
                                     <div className="w-[24px] h-[24px] relative">
                                         <Image
                                             src="/icons/link.svg"
@@ -436,7 +497,10 @@ export default function CreateToken() {
                                         Add Another Link
                                     </div>
                                 </div>
-                                <div className="cursor-pointer flex md:flex-col items-center justify-center py-[18px] md:py-10 bg-[#06050E] border border-[#ffffff1f] rounded-xl gap-1.5">
+                                <div
+                                    onClick={() => handleInputLink("link2")}
+                                    className="cursor-pointer flex md:flex-col items-center justify-center py-[18px] md:py-10 bg-[#06050E] border border-[#ffffff1f] rounded-xl gap-1.5"
+                                >
                                     <div className="w-[24px] h-[24px] relative">
                                         <Image
                                             src="/icons/link.svg"
