@@ -5,6 +5,7 @@ import { sliceString, timeDiff } from "@/utils";
 import * as dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import Skeleton from "./Skeleton";
+import copy from "copy-to-clipboard";
 
 dayjs.extend(utc);
 
@@ -73,7 +74,10 @@ export default function HighlightProject({ token }: { token?: IToken }) {
                         <div>Contract:</div>
                         <div>{sliceString(token.token, 6, 4)}</div>
                     </div>
-                    <div className="cursor-pointer w-[20px] h-[24px] relative">
+                    <div
+                        onClick={() => copy(token.token)}
+                        className="cursor-pointer w-[20px] h-[24px] relative"
+                    >
                         <Image
                             src="/icons/copy.svg"
                             alt="copy"

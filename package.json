@@ -22,6 +22,7 @@
         "@solana/web3.js": "^1.95.3",
         "axios": "^1.7.7",
         "clsx": "^2.1.1",
+        "copy-to-clipboard": "^3.3.3",
         "dayjs": "^1.11.13",
         "next": "14.2.7",
         "react": "^18",

@@ -90,7 +90,7 @@ export default function Home() {
                     </div>
 
                     <div className="flex flex-wrap justify-center gap-[19px] text-[#000000]">
-                        <button className="flex md:hidden items-center justify-center gap-[11px] p-2.5 btn-normal">
+                        <button className="flex items-center justify-center gap-[11px] p-2.5 btn-normal">
                             <span> How to launch</span>
                             <div className="w-[18px] h-[18px] relative">
                                 <Image
@@ -102,7 +102,7 @@ export default function Home() {
                             </div>
                         </button>
 
-                        <button className="flex md:hidden items-center justify-center gap-[11px] p-2.5 btn-normal">
+                        <button className="flex items-center justify-center gap-[11px] p-2.5 btn-normal">
                             <span>Product order</span>
                             <div className="w-[18px] h-[18px] relative">
                                 <Image
