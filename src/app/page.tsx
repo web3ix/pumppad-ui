@@ -2,6 +2,8 @@
 
 import HighlightProject from "@/components/HighlightProject";
 import ProjectItem from "@/components/ProjectItem";
+import SupportNetwork from "@/components/home/SupportNetwork";
+import TopTokenBar from "@/components/home/TopBar";
 import useConnect from "@/hooks/useConnect";
 import { IToken, ITrade } from "@/store";
 import { fetcher } from "@/utils";
@@ -127,79 +129,90 @@ export default function Home() {
                         </button>
                     </div>
                 </div>
-                {/* <ul className="flex flex-col md:flex-row gap-3 md:gap-12 justify-between font-medium text-[#C4CBF5]">
-                    <li className="flex gap-2 items-center">
-                        <div className="cursor-pointer w-10 h-10 relative">
-                            <Image
-                                src="/icons/launch1.svg"
-                                alt="launch1"
-                                fill
-                                sizes="any"
-                            />
-                        </div>
-                        <div>Takes just a few seconds</div>
-                    </li>
-                    <li className="flex gap-2 items-center">
-                        <div className="cursor-pointer w-10 h-10 relative">
-                            <Image
-                                src="/icons/launch2.svg"
-                                alt="launch1"
-                                fill
-                                sizes="any"
-                            />
-                        </div>
-                        <div>Free enhanced token info!</div>
-                    </li>
-                    <li className="flex gap-2 items-center">
-                        <div className="cursor-pointer w-10 h-10 relative">
-                            <Image
-                                src="/icons/launch3.svg"
-                                alt="launch1"
-                                fill
-                                sizes="any"
-                            />
-                        </div>
-                        <div>Free to deploy tokens with a gas fee</div>
-                    </li>
-                </ul> */}
             </div>
 
             {/* <TopBar /> */}
+            <div className="mb-[40px] md:mb-[100px]">
+                <div className="mb-[56px]">
+                    <SupportNetwork />
+                </div>
+                <TopTokenBar />
+
+                {/* <div className="w-[99vw] max-w-[99vw] flex overflow-x-hidden">
+                    <div className="py-12 animate-marquee whitespace-nowrap">
+                        <button className="min-w-[140px] 2xl:min-w-[250px] font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#0038FF]">
+                            Trending
+                        </button>
+                        <button className="min-w-[140px] 2xl:min-w-[250px] font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
+                            Top
+                        </button>
+                        <button className="min-w-[140px] 2xl:min-w-[250px] font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
+                            Rasing
+                        </button>
+                        <button className="min-w-[140px] 2xl:min-w-[250px] font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
+                            New
+                        </button>
+                        <button className="min-w-[140px] 2xl:min-w-[250px] font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
+                            Finished
+                        </button>
+                    </div>
+
+                    <button className="min-w-[140px] 2xl:min-w-[250px] font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#0038FF]">
+                        Trending
+                    </button>
+                    <button className="min-w-[140px] 2xl:min-w-[250px] font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
+                        Top
+                    </button>
+                    <button className="min-w-[140px] 2xl:min-w-[250px] font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
+                        Rasing
+                    </button>
+                    <button className="min-w-[140px] 2xl:min-w-[250px] font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
+                        New
+                    </button>
+                    <button className="min-w-[140px] 2xl:min-w-[250px] font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
+                        Finished
+                    </button>
+                    <input
+                        className="min-w-[200px] flex-1 col-span-2 font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient"
+                        placeholder="Search"
+                    />
+                </div> */}
+            </div>
 
             {/* King of hill */}
             <HighlightProject token={data?.kingOfHill?.[0]} />
 
             {/* Filters */}
-            <div className="overflow-x-scroll">
-                <div className="grid grid-cols-7 gap-2">
-                    <button className="font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#0038FF]">
+            <div className="w-full">
+                <div className="w-full max-w-full flex gap-2 items-center overflow-x-scroll">
+                    <button className="min-w-[140px] 2xl:min-w-[250px] font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#0038FF]">
                         Trending
                     </button>
-                    <button className="font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
+                    <button className="min-w-[140px] 2xl:min-w-[250px] font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
                         Top
                     </button>
-                    <button className="font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
+                    <button className="min-w-[140px] 2xl:min-w-[250px] font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
                         Rasing
                     </button>
-                    <button className="font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
+                    <button className="min-w-[140px] 2xl:min-w-[250px] font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
                         New
                     </button>
-                    <button className="font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
+                    <button className="min-w-[140px] 2xl:min-w-[250px] font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
                         Finished
                     </button>
                     <input
-                        className="col-span-2 font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient"
+                        className="min-w-[200px] flex-1 col-span-2 font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient"
                         placeholder="Search"
                     />
                 </div>
-                <div className="grid grid-cols-7 gap-2 mt-2">
-                    <button className="font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
+                <div className="w-full max-w-full flex gap-2 items-center mt-2 overflow-x-scroll">
+                    <button className="min-w-[140px] 2xl:min-w-[250px] font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
                         Age
                     </button>
-                    <button className="font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
+                    <button className="min-w-[140px] 2xl:min-w-[250px] font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
                         Min progress
                     </button>
-                    <button className="font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
+                    <button className="min-w-[140px] 2xl:min-w-[250px] font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
                         max progress
                     </button>
                 </div>

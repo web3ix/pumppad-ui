@@ -23,7 +23,8 @@
 }
 
 ::-webkit-scrollbar {
-    width: 0.5px !important;
+    width: 5px !important;
+    height: 5px !important;
 }
 
 /* Handle */
@@ -88,19 +89,6 @@ textarea {
     /* border: 1px solid #a9ace7; */
     border: 1px solid #8a8edc66;
     border-bottom: 1px solid #8a8edc66;
-}
-
-.animate-marquee {
-    animation: marquee 5s linear infinite;
-}
-
-@keyframes marquee {
-    0% {
-        left: 0;
-    }
-    100% {
-        left: -100%;
-    }
 }
 
 .box-shadow-stats {
