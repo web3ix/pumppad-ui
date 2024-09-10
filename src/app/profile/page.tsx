@@ -22,11 +22,11 @@ export default function Home() {
 
             <div>
                 {/* Project list */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {new Array(6).fill("").map((_, idx) => (
                         <ProjectItem key={idx} />
                     ))}
-                </div>
+                </div> */}
 
                 <div className="mt-6 flex justify-center">
                     <button className="font-vortex md:block py-2 px-6 rounded-md text-sm font-semibold bg-[#ffffff] text-[#000000]">

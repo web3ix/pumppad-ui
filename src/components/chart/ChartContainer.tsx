@@ -36,7 +36,6 @@ export const TVChartContainer = (
                 "header_symbol_search",
                 "header_compare",
                 "left_toolbar",
-                "footer_resolutions",
                 "header_screenshot",
                 "header_undo_redo",
                 "header_quick_search",
@@ -50,15 +49,6 @@ export const TVChartContainer = (
             autosize: props.autosize,
             timezone: "Asia/Bangkok",
             debug: true,
-            overrides: {
-                rightPriceScale: {
-                    scaleMargins: {
-                        top: 0.1,
-                        bottom: 0.1,
-                    },
-                    invertScale: true,
-                },
-            },
             theme: "dark",
             custom_formatters: {
                 priceFormatterFactory: (symbolInfo: any, minTick: any) => {

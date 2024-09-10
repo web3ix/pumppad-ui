@@ -208,7 +208,7 @@ export default class CurveSdk {
         return tx;
     }
 
-    getMintAccountPubKey(symbol: string): PublicKey {
+    getTokenPda(symbol: string): PublicKey {
         return getMintAccountPubKey(
             this.program,
             this.configAccountPubKey,
