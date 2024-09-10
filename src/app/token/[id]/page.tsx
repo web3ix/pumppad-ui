@@ -72,14 +72,6 @@ export default function TokenDetailPage({
             const parsedAmount = new BN(+amount * 10 ** 9);
 
             if (isBuy) {
-                const reserveToBuy = await sdk.fetchReserveToBuy(
-                    data?.symbol,
-                    parsedAmount
-                );
-                const maxReserveAmount = reserveToBuy.add(
-                    reserveToBuy.div(new BN("5"))
-                ); // 120%
-
                 const createTx = await sdk.buyToken(
                     publicKey,
                     data.symbol,
@@ -92,14 +84,6 @@ export default function TokenDetailPage({
 
                 alert(`Buy successful. Tx hash: ${txHash}`);
             } else {
-                const reserveForSell = await sdk.fetchRefundForSell(
-                    data.symbol,
-                    parsedAmount
-                );
-                const minReserveAmount = reserveForSell.add(
-                    reserveForSell.div(new BN("5"))
-                ); // 80%
-
                 const createTx = await sdk.sellToken(
                     publicKey,
                     data.symbol,
@@ -171,8 +155,30 @@ export default function TokenDetailPage({
                             })}
                         >
                             <div className="text-[15px] leading-[24px] grid grid-cols-2 text-center">
-                                <h1 className="btn-primary py-[18px]">Buy</h1>
-                                <h1 className="btn-normal2 py-[18px]">Sell</h1>
+                                <h1
+                                    onClick={() => setIsBuy(true)}
+                                    className={clsx(
+                                        "cursor-pointer py-[18px] backdrop-blur-md",
+                                        {
+                                            "btn-primary": isBuy,
+                                            "btn-normal2": !isBuy,
+                                        }
+                                    )}
+                                >
+                                    Buy
+                                </h1>
+                                <h1
+                                    onClick={() => setIsBuy(false)}
+                                    className={clsx(
+                                        "cursor-pointer py-[18px] backdrop-blur-md",
+                                        {
+                                            "btn-primary": !isBuy,
+                                            "btn-normal2": isBuy,
+                                        }
+                                    )}
+                                >
+                                    Sell
+                                </h1>
                             </div>
 
                             <div className="md:px-[34px] pb-[34px]">
