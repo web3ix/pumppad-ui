@@ -1,6 +1,14 @@
 "use client";
 
+import HighlightProject from "@/components/HighlightProject";
+import ProjectItem from "@/components/ProjectItem";
+import useConnect from "@/hooks/useConnect";
+import { IToken, ITrade } from "@/store";
+import { fetcher } from "@/utils";
+import { useWallet } from "@solana/wallet-adapter-react";
 import Image from "next/image";
+import Link from "next/link";
+import useSWR from "swr";
 
 const CHAINS_SUPPORTED = [
     "ethereum",
@@ -13,12 +21,20 @@ const CHAINS_SUPPORTED = [
     "solana",
 ];
 
-export default function CreateToken() {
+export default function Home() {
+    const { publicKey } = useWallet();
+    const { connect } = useConnect();
+
+    const { data, error, isLoading, mutate } = useSWR<{
+        tokens: IToken[];
+        trades: ITrade[];
+        kingOfHill: IToken[];
+    }>(`${process.env.NEXT_PUBLIC_API}/bond/stats`, fetcher);
+
     return (
-        <div className="px-[20px] md:px-[100px] flex flex-col items-stretch md:items-center gap-12 relative">
-            <div className="launch-bg1"></div>
-            <div className="flex flex-col gap-4 items-center">
-                <h1 className="text-[32px] md:leading-[160px] md:text-[200px] primary-text-gradient text-center mt-[60px]">
+        <div className="px-5 md:px-[120px] flex flex-col items-stretch md:items-center gap-12 relative">
+            <div className="flex flex-col gap-[22px] items-center my-20">
+                <h1 className="text-[32px] md:leading-[170px] md:text-[200px] primary-text-gradient text-center">
                     PUMPPAD
                 </h1>
                 <div className="text-center text-[15px] md:text-[20px] text-[#94A3B8]">
@@ -27,28 +43,87 @@ export default function CreateToken() {
                     </div>
                     <div>Powered by DEVHUB AI</div>
                 </div>
-                <div className="flex flex-col gap-5">
-                    <div className="flex flex-col md:flex-row justify-center gap-5">
-                        <button className="font-vortex md:block py-2 px-6 rounded-md text-sm font-semibold bg-[#0038FF]">
-                            Connect wallet
-                        </button>
+                <div className="flex flex-col gap-[22px] font-vortex">
+                    <div className="flex flex-col md:flex-row items-center justify-center gap-5">
+                        {!publicKey && (
+                            <button
+                                onClick={connect}
+                                className="flex items-center gap-[11px] py-2.5 px-6 btn-primary"
+                            >
+                                <span>Connect wallet</span>
+                                <div className="w-[18px] h-[18px] relative">
+                                    <Image
+                                        src="/icons/wallet.svg"
+                                        alt="wallet"
+                                        fill
+                                        sizes="any"
+                                    />
+                                </div>
+                            </button>
+                        )}
 
-                        <button className="font-vortex md:block py-2 px-6 rounded-md text-sm font-semibold bg-gradient-to-b from-[#4338CA] to-[#FFFFFF]">
-                            Launch your token now
-                        </button>
+                        <Link href="/create" passHref legacyBehavior>
+                            <button className="flex items-center gap-[11px] py-2.5 px-[18px] btn-secondary">
+                                <span> Launch your token now</span>
+                                <div className="w-[18px] h-[18px] relative">
+                                    <Image
+                                        src="/icons/launch.svg"
+                                        alt="launch"
+                                        fill
+                                        sizes="any"
+                                    />
+                                </div>
+                            </button>
+                        </Link>
 
-                        <button className="font-vortex md:block py-2 px-6 rounded-md text-sm font-semibold bg-[#0038FF]">
-                            Product order
+                        <button className="hidden md:flex items-center gap-[11px] py-2 px-6 btn-primary">
+                            <span>Product order</span>
+                            <div className="w-[18px] h-[18px] relative">
+                                <Image
+                                    src="/icons/order.svg"
+                                    alt="order"
+                                    fill
+                                    sizes="any"
+                                />
+                            </div>
                         </button>
                     </div>
 
-                    <div className="flex justify-center gap-5">
-                        <button className="font-vortex md:block py-2 px-6 rounded-md text-sm font-semibold bg-[#ffffff] text-[#000000]">
-                            How to launch
+                    <div className="flex flex-wrap justify-center gap-[19px] text-[#000000]">
+                        <button className="flex md:hidden items-center justify-center gap-[11px] p-2.5 btn-normal">
+                            <span> How to launch</span>
+                            <div className="w-[18px] h-[18px] relative">
+                                <Image
+                                    src="/icons/how-to-launch.svg"
+                                    alt="how-to-launch"
+                                    fill
+                                    sizes="any"
+                                />
+                            </div>
                         </button>
 
-                        <button className="font-vortex md:block py-2 px-6 rounded-md text-sm font-semibold bg-[#ffffff] text-[#000000]">
-                            Agent support
+                        <button className="flex md:hidden items-center justify-center gap-[11px] p-2.5 btn-normal">
+                            <span>Product order</span>
+                            <div className="w-[18px] h-[18px] relative">
+                                <Image
+                                    src="/icons/order.svg"
+                                    alt="order"
+                                    fill
+                                    sizes="any"
+                                />
+                            </div>
+                        </button>
+
+                        <button className="flex md:hidden items-center justify-center gap-[11px] p-2.5 btn-normal">
+                            <span>Agent support</span>
+                            <div className="w-[18px] h-[18px] relative">
+                                <Image
+                                    src="/icons/support.svg"
+                                    alt="support"
+                                    fill
+                                    sizes="any"
+                                />
+                            </div>
                         </button>
                     </div>
                 </div>
@@ -91,72 +166,51 @@ export default function CreateToken() {
 
             {/* <TopBar /> */}
 
-            <div>
-                <div className="flex flex-col md:flex-row p-7 gap-7 border-gradient rounded-xl">
-                    <div className="cursor-pointer w-full pt-[150%] md:w-[280px] md:pt-[400px] relative">
-                        <Image
-                            src="/mock-token.png"
-                            alt="mock-token"
-                            fill
-                            sizes="any"
-                        />
-                    </div>
+            {/* King of hill */}
+            <HighlightProject token={data?.kingOfHill?.[0]} />
 
-                    <div className="flex flex-col justify-between gap-10">
-                        <h1 className="leading-[100px] text-[100px]">DOGS</h1>
-                        <div>
-                            <div className="text-[#19FB9B] text-[14px] md:text-[20px]">
-                                Contract: TX9mipnPM6rHdpxpHmVqEn1bo9qY1u6tq3
-                            </div>
-                            {/* <div>icon</div> */}
-                        </div>
-
-                        <p className="text-[#94A3B8]">
-                            Who is Spotty? 🐕 Spotty, the unofficial logo and
-                            main mascot of VK, was created by Pavel Durov. He
-                            drew this iconic dog during a charity auction to
-                            support orphanages, and soon, Spotty became a
-                            beloved symbol of VK.
-                        </p>
-
-                        <div>
-                            <button className="font-vortex md:block py-2 px-6 rounded-md text-sm font-semibold bg-[#0038FF]">
-                                Pump it
-                            </button>
-                        </div>
-                        <div className="font-vortex grid grid-cols-1 md:grid-cols-4 gap-10">
-                            <div className="flex flex-col items-stretch justify-between gap-6 p-4 bg-[#000000] box-shadow-stats border-gradient rounded-xl">
-                                <div className="flex justify-between text-[16px]">
-                                    <div className="text-[#666666]">PRICE</div>
-                                    <div>15 %</div>
-                                </div>
-                                <div className="flex justify-between text-[32px]">
-                                    <div>0.00015</div>
-                                    <div>ETH</div>
-                                </div>
-                            </div>
-
-                            <div className="flex flex-col items-stretch justify-between gap-6 p-4 bg-[#000000] box-shadow-stats border-gradient rounded-xl">
-                                <div className="text-[16px] text-[#666666]">
-                                    Marketcap
-                                </div>
-                                <div className="text-[32px]">$100K</div>
-                            </div>
-                            <div className="flex flex-col items-stretch justify-between gap-6 p-4 bg-[#000000] box-shadow-stats border-gradient rounded-xl">
-                                <div className="text-[16px] text-[#666666]">
-                                    Liquidity
-                                </div>
-                                <div className="text-[32px]">$14k</div>
-                            </div>
-                            <div className="flex flex-col items-stretch justify-between gap-6 p-4 bg-[#000000] box-shadow-stats border-gradient rounded-xl">
-                                <div className="text-[16px] text-[#666666]">
-                                    Token created
-                                </div>
-                                <div className="text-[32px]">1H 17M</div>
-                            </div>
-                        </div>
-                    </div>
+            {/* Filters */}
+            <div className="overflow-x-scroll">
+                <div className="grid grid-cols-7 gap-2">
+                    <button className="font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#0038FF]">
+                        Trending
+                    </button>
+                    <button className="font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
+                        Top
+                    </button>
+                    <button className="font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
+                        Rasing
+                    </button>
+                    <button className="font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
+                        New
+                    </button>
+                    <button className="font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
+                        Finished
+                    </button>
+                    <input
+                        className="col-span-2 font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient"
+                        placeholder="Search"
+                    />
                 </div>
+                <div className="grid grid-cols-7 gap-2 mt-2">
+                    <button className="font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
+                        Age
+                    </button>
+                    <button className="font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
+                        Min progress
+                    </button>
+                    <button className="font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
+                        max progress
+                    </button>
+                </div>
+            </div>
+            {/* TODO */}
+
+            {/* Project list */}
+            <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
+                {data?.tokens.map((token, idx) => (
+                    <ProjectItem key={idx} token={token} />
+                ))}
             </div>
         </div>
     );

@@ -1,9 +1,10 @@
 import Image from "next/image";
+import Link from "next/link";
 
 export default function Footer() {
     return (
-        <div className="px-[20px] md:px-[100px] py-[48px] flex flex-col md:flex-row justify-between items-center md:items-start gap-8">
-            <div className="flex flex-col md:flex-row gap-8 md:gap-[120px] items-center md:items-start">
+        <div className="px-5 md:px-[120px] py-[48px] flex flex-col md:flex-row justify-between items-center md:items-start gap-8">
+            <div className="flex flex-col md:flex-row gap-8 md:gap-10 xl:gap-20 2xl:gap-[120px] items-center md:items-start">
                 <div className="w-[120px] h-[32px] relative">
                     <Image src="/logo-w-text.png" alt="logo" fill sizes="any" />
                 </div>
@@ -55,27 +56,31 @@ export default function Footer() {
                 </div>
 
                 <div className="flex gap-2 items-center justify-center md:justify-end">
-                    <div className="border-gradient py-2 px-3 rounded-md">
-                        <div className="w-[24px] h-[24px] relative">
-                            <Image
-                                src="/icons/telegram.svg"
-                                alt="telegram"
-                                fill
-                                sizes="any"
-                            />
+                    <Link href="https://t.me/pumppad" target="_blank">
+                        <div className="border-gradient py-2 px-3 rounded-md">
+                            <div className="w-[24px] h-[24px] relative">
+                                <Image
+                                    src="/icons/telegram.svg"
+                                    alt="telegram"
+                                    fill
+                                    sizes="any"
+                                />
+                            </div>
                         </div>
-                    </div>
+                    </Link>
 
-                    <div className="border-gradient py-2 px-3 rounded-md">
-                        <div className="w-[24px] h-[24px] relative">
-                            <Image
-                                src="/icons/twitter.svg"
-                                alt="twitter"
-                                fill
-                                sizes="any"
-                            />
+                    <Link href="https://x.com/pumppad_vip" target="_blank">
+                        <div className="border-gradient py-2 px-3 rounded-md">
+                            <div className="w-[24px] h-[24px] relative">
+                                <Image
+                                    src="/icons/twitter.svg"
+                                    alt="twitter"
+                                    fill
+                                    sizes="any"
+                                />
+                            </div>
                         </div>
-                    </div>
+                    </Link>
 
                     <div className="border-gradient py-2 px-3 rounded-md">
                         <div className="w-[24px] h-[24px] relative">

@@ -56,6 +56,11 @@ export type Curve = {
       "name": "TOTAL_VIRTUAL_RESERVE",
       "type": "u64",
       "value": "50_000_000_000_u64"
+    },
+    {
+      "name": "TARGET_RESERVE",
+      "type": "u64",
+      "value": "50_000_000_000_u64"
     }
   ],
   "instructions": [
@@ -800,6 +805,11 @@ export const IDL: Curve = {
     },
     {
       "name": "TOTAL_VIRTUAL_RESERVE",
+      "type": "u64",
+      "value": "50_000_000_000_u64"
+    },
+    {
+      "name": "TARGET_RESERVE",
       "type": "u64",
       "value": "50_000_000_000_u64"
     }

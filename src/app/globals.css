@@ -23,7 +23,7 @@
 }
 
 ::-webkit-scrollbar {
-    width: 0.5px;
+    width: 0.5px !important;
 }
 
 /* Handle */
@@ -43,66 +43,51 @@ body {
     /* font-family: Inter; */
     font-size: 14px;
     font-family: "Inter", sans-serif;
+
+    -moz-user-select: none;
+    -khtml-user-select: none;
+    -webkit-user-select: none;
+
+    /*
+     Introduced in Internet Explorer 10.
+     See http://ie.microsoft.com/testdrive/HTML5/msUserSelect/
+   */
+    -ms-user-select: none;
+    user-select: none;
 }
 
 h1 {
     font-family: CosmicVortex !important;
+    line-height: 90% !important;
 }
 
 .font-vortex {
     font-family: CosmicVortex !important;
+    line-height: 90% !important;
 }
 
 input,
 textarea {
-    background-color: #000000;
+    background-color: #000000 !important;
     border: 1px solid #ffffff;
     width: 100%;
     padding: 13px 10px;
-    border-radius: 10px;
+    border-radius: 12px;
     font-size: 16px;
 }
 
-/* F1F5F9 */
 .primary-text-gradient {
-    background: linear-gradient(to bottom, #4338ca 24%, #ffffff 40%);
+    background: linear-gradient(to top, #fff 62.72%, #4338ca 87.77%);
     background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    line-height: 90% !important;
 }
 
 .border-gradient {
     /* border: 1px solid #a9ace7; */
     border: 1px solid #8a8edc66;
     border-bottom: 1px solid #8a8edc66;
-}
-
-/* .primary-border {
-    border-top: 1px solid #a9ace7;
-
-    border-bottom: 1px solid rgba(138, 142, 220, 0.4);
-} */
-
-.launch-bg1 {
-    background-image: url("/bg/launch-bg1.png");
-    /* background-position: center; */
-    position: absolute;
-    height: 1000px;
-    left: 0;
-    right: 0;
-    top: -70px;
-    z-index: -999;
-}
-
-.launch-bg2 {
-    background-image: url("/bg/launch-bg2.png");
-    background-position: center;
-    position: absolute;
-    height: 1000px;
-    left: 0;
-    right: 0;
-    top: 700px;
-    z-index: -1;
 }
 
 .animate-marquee {
@@ -121,4 +106,81 @@ textarea {
 .box-shadow-stats {
     -webkit-box-shadow: 0 0 10px #0038ff;
     box-shadow: 0 0 10px #0038ff;
+}
+
+#menu-icon {
+    border-radius: 5px;
+    background: radial-gradient(
+        50% 50% at 50% 50%,
+        rgba(67, 56, 202, 0) 0%,
+        rgba(67, 56, 202, 0.2) 100%
+    );
+}
+
+.btn-primary {
+    border-radius: 5px;
+    background: radial-gradient(
+            70.71% 70.71% at 50% 50%,
+            rgba(255, 255, 255, 0.12) 0%,
+            rgba(0, 0, 0, 0) 100%
+        ),
+        #0047ff;
+    box-shadow:
+        1px 1px 2px 0px rgba(255, 255, 255, 0.24) inset,
+        0px 1px 3px 0px rgba(10, 124, 255, 0.24),
+        0px 2px 6px 0px rgba(10, 124, 255, 0.24),
+        0px 4px 8px 0px rgba(10, 124, 255, 0.12),
+        0px 16px 32px -8px rgba(10, 124, 255, 0.48);
+}
+
+.btn-secondary {
+    border-radius: 5px;
+    background: linear-gradient(2deg, #fff -38.65%, #4338ca 88.01%);
+    box-shadow:
+        1px 1px 2px 0px rgba(255, 255, 255, 0.24) inset,
+        0px 1px 3px 0px rgba(10, 124, 255, 0.24),
+        0px 2px 6px 0px rgba(10, 124, 255, 0.24),
+        0px 4px 8px 0px rgba(10, 124, 255, 0.12),
+        0px 16px 32px -8px rgba(10, 124, 255, 0.48);
+}
+.btn-normal {
+    border-radius: 5px;
+    background: radial-gradient(
+            70.71% 70.71% at 50% 50%,
+            rgba(255, 255, 255, 0.12) 0%,
+            rgba(0, 0, 0, 0) 100%
+        ),
+        #fff;
+    box-shadow:
+        1px 1px 2px 0px rgba(255, 255, 255, 0.24) inset,
+        0px 1px 3px 0px rgba(10, 124, 255, 0.24),
+        0px 2px 6px 0px rgba(10, 124, 255, 0.24),
+        0px 4px 8px 0px rgba(10, 124, 255, 0.12),
+        0px 16px 32px -8px rgba(10, 124, 255, 0.48);
+}
+
+.btn-normal2 {
+    border-radius: 5px;
+    background: radial-gradient(
+            70.71% 70.71% at 50% 50%,
+            rgba(255, 255, 255, 0.12) 0%,
+            rgba(0, 0, 0, 0) 100%
+        ),
+        rgba(0, 71, 255, 0);
+    box-shadow:
+        1px 1px 2px 0px rgba(255, 255, 255, 0.24) inset,
+        0px 1px 3px 0px rgba(10, 124, 255, 0.24),
+        0px 2px 6px 0px rgba(10, 124, 255, 0.24),
+        0px 4px 8px 0px rgba(10, 124, 255, 0.12),
+        0px 16px 32px -8px rgba(10, 124, 255, 0.48);
+}
+
+.bg-icon-primary {
+    border-radius: 5px;
+    border: 1px solid #a5b4fc;
+    background: radial-gradient(
+        50% 50% at 50% 50%,
+        rgba(67, 56, 202, 0) 0%,
+        rgba(67, 56, 202, 0.2) 100%
+    );
 }

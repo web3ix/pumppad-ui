@@ -1,20 +1,18 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useWalletModal } from "@solana/wallet-adapter-react-ui";
-import { useCallback } from "react";
 import { useWallet } from "@solana/wallet-adapter-react";
+import useConnect from "@/hooks/useConnect";
 
 export default function Header() {
     const { publicKey } = useWallet();
-    const { visible, setVisible } = useWalletModal();
-
-    const handleConnect = useCallback(() => {
-        if (visible) return;
-    }, [publicKey, visible]);
+    const { connect } = useConnect();
 
     return (
-        <div className="px-[20px] md:px-[100px] py-[20px] flex justify-between items-center">
+        <div className="px-5 md:px-[120px] py-6 flex justify-between items-center relative">
+            <div className="md:hidden absolute top-0 left-0 right-0 bg-mobile-bg1 min-h-[390px] -z-50"></div>
+            <div className="hidden md:block absolute top-0 left-0 right-0 bg-bg1 min-h-[1080px] -z-50"></div>
+
             <Link href="/" passHref legacyBehavior>
                 <div className="cursor-pointer w-[120px] h-[32px] relative">
                     <Image src="/logo-w-text.png" alt="logo" fill sizes="any" />
@@ -38,12 +36,15 @@ export default function Header() {
 
             <div className="flex items-center">
                 <div className="flex gap-2">
-                    <Link href="/docs" passHref legacyBehavior>
-                        <button className="p-[8px] border border-[#8a8edc66] rounded-md text-sm flex justify-center items-center font-semibold">
+                    <Link href="https://docs.pumppad.vip/" target="_blank">
+                        <button className="py-2 px-3 border border-[#334155] rounded-md text-[#F1F5F9] text-sm flex justify-center items-center font-semibold">
                             Documents
                         </button>
                     </Link>
-                    <div className="border-gradient md:hidden p-[8px] rounded-md flex justify-center items-center md:bg-[#0038FF]">
+                    <div
+                        id="menu-icon"
+                        className="cursor-pointer border-gradient md:hidden py-2 px-3 rounded-md flex justify-center items-center md:bg-[#0038FF]"
+                    >
                         <div className="w-[18px] h-[18px] relative ">
                             <Image
                                 src="/icons/menu.svg"
@@ -54,12 +55,20 @@ export default function Header() {
                         </div>
                     </div>
 
-                    <button
-                        className="hidden md:block py-2 px-6 rounded-md text-sm justify-center items-center font-semibold md:bg-[#0038FF]"
-                        onClick={() => setVisible(true)}
-                    >
-                        Connect
-                    </button>
+                    {!publicKey ? (
+                        <button
+                            className="hidden md:block py-2 px-3 rounded-md text-sm justify-center items-center font-semibold md:bg-[#0038FF]"
+                            onClick={connect}
+                        >
+                            Connect
+                        </button>
+                    ) : (
+                        <Link href="/profile" passHref legacyBehavior>
+                            <button className="hidden md:block py-2 px-3 rounded-md text-sm justify-center items-center font-semibold md:bg-[#0038FF]">
+                                {`${publicKey.toString().slice(0, 4)}...${publicKey.toString().slice(-3)}`}
+                            </button>
+                        </Link>
+                    )}
                 </div>
             </div>
         </div>

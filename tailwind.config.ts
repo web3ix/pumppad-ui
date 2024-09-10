@@ -9,9 +9,15 @@ const config: Config = {
     theme: {
         extend: {
             backgroundImage: {
-                "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-                "gradient-conic":
-                    "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+                "mobile-bg1": "url('/bg/bg-mobile1.png')",
+                bg1: "url('/bg/bg1.png')",
+                "launch-bg": "url('/bg/launch-bg.png')",
+                // "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
+                // "gradient-conic":
+                //     "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+            },
+            borderRadius: {
+                md: "5px",
             },
         },
     },
