@@ -20,11 +20,8 @@ export default function TopTokenBar() {
         <div className="w-[99vw] max-w-[99vw] relative flex overflow-x-hidden">
             <div className="animate-marquee flex items-center gap-[27px]">
                 {trades?.map((trade, idx) => (
-                    <Link href={`/token/${trade.token!.token}`}>
-                        <span
-                            key={idx}
-                            className=" flex items-center gap-3 px-3 py-2  top-bar-item "
-                        >
+                    <Link key={idx} href={`/token/${trade.token!.token}`}>
+                        <span className=" flex items-center gap-3 px-3 py-2  top-bar-item ">
                             <div className="w-[38px] h-[38px] relative">
                                 <Image
                                     src={trade.token!.icon}
@@ -54,11 +51,8 @@ export default function TopTokenBar() {
 
             <div className="absolute top-0 animate-marquee2 pl-8 flex items-center gap-[27px]">
                 {trades?.map((trade, idx) => (
-                    <Link href={`/token/${trade.token!.token}`}>
-                        <span
-                            key={idx}
-                            className=" flex items-center gap-3 px-3 py-2  top-bar-item "
-                        >
+                    <Link key={idx} href={`/token/${trade.token!.token}`}>
+                        <span className=" flex items-center gap-3 px-3 py-2  top-bar-item ">
                             <div className="w-[38px] h-[38px] relative">
                                 <Image
                                     src={trade.token!.icon}
