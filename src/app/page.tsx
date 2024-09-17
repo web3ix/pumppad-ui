@@ -99,7 +99,12 @@ export default function Home() {
                             </button>
                         </Link>
 
-                        <Link href="https://t.me/pump_agent" target="_blank">
+                        <Link
+                            href="https://t.me/pump_agent"
+                            target="_blank"
+                            passHref
+                            legacyBehavior
+                        >
                             <button className="hidden md:flex items-center justify-center gap-[11px] py-4 min-w-[305px] btn-primary">
                                 <span>Product order</span>
                                 <div className="w-[18px] h-[18px] relative">
