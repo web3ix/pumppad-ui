@@ -1,4 +1,4 @@
-"use client"; 
+"use client";
 import { ReactNode, useMemo } from "react";
 import {
     ConnectionProvider,
@@ -7,8 +7,7 @@ import {
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
 import { WalletAdapterNetwork } from "@solana/wallet-adapter-base";
 import { clusterApiUrl } from "@solana/web3.js";
-require('@solana/wallet-adapter-react-ui/styles.css');
-
+require("@solana/wallet-adapter-react-ui/styles.css");
 
 interface WalletProviderProps {
     children: ReactNode;

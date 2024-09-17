@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/layouts/Header";
 import Footer from "@/components/layouts/Footer";
-import WalletAdapter from "@/components/layouts/WalletAdapter";
 import Script from "next/script";
+import ProviderWrapper from "@/components/layouts/ProviderWrapper";
 
 export const metadata: Metadata = {
     title: "PumpPad",
@@ -72,13 +72,13 @@ export default function RootLayout({
                 />
                 <link rel="manifest" href="/site.webmanifest"></link>
             </head>
-            <WalletAdapter>
+            <ProviderWrapper>
                 <body className="flex flex-col items-stretch justify-between min-h-dvh">
                     <Header />
                     <div>{children}</div>
                     <Footer />
                 </body>
-            </WalletAdapter>
+            </ProviderWrapper>
         </html>
     );
 }

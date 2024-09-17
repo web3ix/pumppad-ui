@@ -5,11 +5,12 @@ import ProjectItem from "@/components/ProjectItem";
 import SupportNetwork from "@/components/home/SupportNetwork";
 import TopTokenBar from "@/components/home/TopBar";
 import useConnect from "@/hooks/useConnect";
-import { IToken, ITrade } from "@/store";
+import { IToken, ITrade, useAppStore } from "@/store";
 import { fetcher } from "@/utils";
 import { useWallet } from "@solana/wallet-adapter-react";
 import Image from "next/image";
 import Link from "next/link";
+import { useEffect } from "react";
 import useSWR from "swr";
 
 const CHAINS_SUPPORTED = [
@@ -27,17 +28,36 @@ export default function Home() {
     const { publicKey } = useWallet();
     const { connect } = useConnect();
 
-    const { data, error, isLoading, mutate } = useSWR<{
-        tokens: IToken[];
-        trades: ITrade[];
-        kingOfHill: IToken[];
-    }>(`${process.env.NEXT_PUBLIC_API}/bond/stats`, fetcher);
+    const { data: kingOfHill } = useSWR<IToken>(
+        `${process.env.NEXT_PUBLIC_API}/bond/king-of-hill`,
+        fetcher
+    );
+
+    const {
+        data: tokens,
+        error,
+        isLoading,
+        mutate: mutateTokens,
+    } = useSWR<IToken[]>(`${process.env.NEXT_PUBLIC_API}/bond/tokens`, fetcher);
+
+    const { socket } = useAppStore();
+
+    useEffect(() => {
+        if (!socket || !tokens || !mutateTokens) return;
+
+        socket.on("new-token", (payload) => {
+            const exist = tokens.find((token) => token.id === payload.id);
+            if (!exist) {
+                mutateTokens([...tokens, payload]);
+            }
+        });
+    }, [socket, tokens, mutateTokens]);
 
     return (
         <div className="px-5 md:px-[120px] flex flex-col items-stretch md:items-center gap-12 relative">
             <div className="flex flex-col gap-[22px] items-center my-20">
                 <h1 className="text-[32px] md:leading-[170px] md:text-[200px] primary-text-gradient text-center">
-                    PUMPPAD
+                    PUMP PAD
                 </h1>
                 <div className="text-center text-[15px] md:text-[20px] text-[#94A3B8]">
                     <div className="mb-2">
@@ -64,7 +84,7 @@ export default function Home() {
                             </button>
                         )}
 
-                        <Link href="/create" passHref legacyBehavior>
+                        <Link href="/create">
                             <button className="flex items-center gap-[11px] py-2.5 px-[18px] btn-secondary">
                                 <span> Launch your token now</span>
                                 <div className="w-[18px] h-[18px] relative">
@@ -78,55 +98,66 @@ export default function Home() {
                             </button>
                         </Link>
 
-                        <button className="hidden md:flex items-center gap-[11px] py-2 px-6 btn-primary">
-                            <span>Product order</span>
-                            <div className="w-[18px] h-[18px] relative">
-                                <Image
-                                    src="/icons/order.svg"
-                                    alt="order"
-                                    fill
-                                    sizes="any"
-                                />
-                            </div>
-                        </button>
+                        <Link href="https://t.me/pump_agent" target="_blank">
+                            <button className="hidden md:flex items-center gap-[11px] py-2 px-6 btn-primary">
+                                <span>Product order</span>
+                                <div className="w-[18px] h-[18px] relative">
+                                    <Image
+                                        src="/icons/order.png"
+                                        alt="order"
+                                        fill
+                                        sizes="any"
+                                    />
+                                </div>
+                            </button>
+                        </Link>
                     </div>
 
                     <div className="flex flex-wrap justify-center gap-[19px] text-[#000000]">
-                        <button className="flex items-center justify-center gap-[11px] p-2.5 btn-normal">
-                            <span> How to launch</span>
-                            <div className="w-[18px] h-[18px] relative">
-                                <Image
-                                    src="/icons/how-to-launch.svg"
-                                    alt="how-to-launch"
-                                    fill
-                                    sizes="any"
-                                />
-                            </div>
-                        </button>
+                        <Link
+                            href="https://docs.pumppad.vip/practice-on-pump-pad/launching-for-builders"
+                            target="_blank"
+                        >
+                            <button className="flex items-center justify-center gap-[11px] p-2.5 btn-normal">
+                                <span> How to launch</span>
+                                <div className="w-[18px] h-[18px] relative">
+                                    <Image
+                                        src="/icons/how-to-launch.svg"
+                                        alt="how-to-launch"
+                                        fill
+                                        sizes="any"
+                                    />
+                                </div>
+                            </button>
+                        </Link>
 
-                        <button className="flex items-center justify-center gap-[11px] p-2.5 btn-normal">
-                            <span>Product order</span>
-                            <div className="w-[18px] h-[18px] relative">
-                                <Image
-                                    src="/icons/order.svg"
-                                    alt="order"
-                                    fill
-                                    sizes="any"
-                                />
-                            </div>
-                        </button>
+                        <Link href="https://t.me/pump_agent" target="_blank">
+                            <button className="flex items-center justify-center gap-[11px] p-2.5 btn-normal">
+                                <span>Product order</span>
+                                <div className="w-[18px] h-[18px] relative">
+                                    <Image
+                                        src="/icons/order.svg"
+                                        alt="order"
+                                        fill
+                                        sizes="any"
+                                    />
+                                </div>
+                            </button>
+                        </Link>
 
-                        <button className="flex md:hidden items-center justify-center gap-[11px] p-2.5 btn-normal">
-                            <span>Agent support</span>
-                            <div className="w-[18px] h-[18px] relative">
-                                <Image
-                                    src="/icons/support.svg"
-                                    alt="support"
-                                    fill
-                                    sizes="any"
-                                />
-                            </div>
-                        </button>
+                        <Link href="https://t.me/pump_agent" target="_blank">
+                            <button className="flex md:hidden items-center justify-center gap-[11px] p-2.5 btn-normal">
+                                <span>Agent support</span>
+                                <div className="w-[18px] h-[18px] relative">
+                                    <Image
+                                        src="/icons/support.svg"
+                                        alt="support"
+                                        fill
+                                        sizes="any"
+                                    />
+                                </div>
+                            </button>
+                        </Link>
                     </div>
                 </div>
             </div>
@@ -180,7 +211,7 @@ export default function Home() {
             </div>
 
             {/* King of hill */}
-            <HighlightProject token={data?.kingOfHill?.[0]} />
+            <HighlightProject token={kingOfHill} />
 
             {/* Filters */}
             <div className="w-full">
@@ -220,8 +251,8 @@ export default function Home() {
             {/* TODO */}
 
             {/* Project list */}
-            <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-6">
-                {data?.tokens.map((token, idx) => (
+            <div className="w-full grid grid-cols-1 md:grid-cols-3 gap-6">
+                {tokens?.map((token, idx) => (
                     <ProjectItem key={idx} token={token} />
                 ))}
             </div>

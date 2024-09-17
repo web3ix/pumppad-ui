@@ -13,7 +13,7 @@ export default function Header() {
             <div className="md:hidden absolute top-0 left-0 right-0 bg-mobile-bg1 min-h-[390px] -z-50"></div>
             <div className="hidden md:block absolute top-0 left-0 right-0 bg-bg1 min-h-[1080px] -z-50"></div>
 
-            <Link href="/" passHref legacyBehavior>
+            <Link href="/">
                 <div className="cursor-pointer w-[120px] h-[32px] relative">
                     <Image src="/logo-w-text.png" alt="logo" fill sizes="any" />
                 </div>
@@ -63,7 +63,7 @@ export default function Header() {
                             Connect
                         </button>
                     ) : (
-                        <Link href="/profile" passHref legacyBehavior>
+                        <Link href="/profile">
                             <button className="hidden md:block py-2 px-3 rounded-md text-sm justify-center items-center font-semibold md:bg-[#0038FF]">
                                 {`${publicKey.toString().slice(0, 4)}...${publicKey.toString().slice(-3)}`}
                             </button>

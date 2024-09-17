@@ -23,8 +23,12 @@ export interface IToken {
     symbol: string;
     uri: string;
     icon: string;
-    banner?: string;
+    banner: string;
     desc: string;
+    supplied: string;
+    reserve: string;
+    parsedSupplied: number;
+    parsedReserve: number;
     link?: any;
     lastPrice: number;
     timestamp: number;

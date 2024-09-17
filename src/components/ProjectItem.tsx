@@ -1,49 +1,193 @@
 import { IToken, ITokenMetadata } from "@/store";
-import { fetcher } from "@/utils";
+import {
+    SOL_PRICE,
+    calcLiquidity,
+    calcMarketCap,
+    calcProgress,
+    timeDiff,
+} from "@/utils";
 import Image from "next/image";
 import Link from "next/link";
-import useSWR from "swr";
 
 export default function ProjectItem({ token }: { token: IToken }) {
-    // const { data: metadata, isLoading } = useSWR<ITokenMetadata>(
-    //     token.uri,
-    //     fetcher
-    // );
-
     return (
         <Link href={`/token/${token.token}`}>
-            <div className="flex flex-col p-6 gap-6 border-gradient rounded-xl bg-[#000]">
-                <div className="flex justify-between">
-                    <div className="cursor-pointer w-[89px] h-[89px] relative">
-                        <Image src={token.icon} alt="icon" fill sizes="any" />
-                    </div>
-                    <div className="cursor-pointer w-[16px] h-[16px] relative">
-                        <Image
-                            src="/icons/arrow.svg"
-                            alt="arrow"
-                            fill
-                            sizes="any"
-                        />
-                    </div>
+            <div className="relative">
+                <div className="border border-[#4338CA] rounded-t-[10px] overflow-hidden w-full h-[180px] relative">
+                    <Image src={token.banner} alt="banner" fill sizes="any" />
                 </div>
+                <div className="-translate-y-10 flex flex-col p-6 gap-8 border-gradient !border-t-[#4338CA] rounded-xl bg-[#000]">
+                    <div className="flex gap-[13px]">
+                        <div className="border border-[#334155] rounded-[10px] overflow-hidden w-[95px] h-[95px] relative">
+                            <Image
+                                src={token.icon}
+                                alt="icon"
+                                fill
+                                sizes="any"
+                            />
+                        </div>
 
-                <h1 className="leading-[30px] text-[30px]">{token.symbol}</h1>
-                {/* <p className="text-[#94A3B8]">{metadata?.description}</p> */}
+                        <div className="pt-0.5 flex flex-col justify-between">
+                            <h1 className="text-[40px]">{token.symbol}</h1>
 
-                <div className="flex justify-between">
-                    <div className="flex font-bold gap-8">
-                        <div className="text-[#19FB9B]">10%</div>
-                        <div>$39k</div>
+                            <div className="flex gap-[5px] items-center">
+                                {token.link?.website && (
+                                    <Link
+                                        href={token.link.website}
+                                        target="_blank"
+                                    >
+                                        <div className="overflow-hidden border border-[#334155] rounded-[5px] py-2 px-3">
+                                            <div className="w-[24px] h-[24px] relative">
+                                                <Image
+                                                    src="/icons/website.svg"
+                                                    alt="website"
+                                                    fill
+                                                    sizes="any"
+                                                />
+                                            </div>
+                                        </div>
+                                    </Link>
+                                )}
+                                {token.link?.telegram && (
+                                    <Link
+                                        href={token.link.telegram}
+                                        target="_blank"
+                                    >
+                                        <div className="overflow-hidden border border-[#334155] rounded-[5px] py-2 px-3">
+                                            <div className="w-[24px] h-[24px] relative">
+                                                <Image
+                                                    src="/icons/telegram.svg"
+                                                    alt="telegram"
+                                                    fill
+                                                    sizes="any"
+                                                />
+                                            </div>
+                                        </div>
+                                    </Link>
+                                )}
+                                {token.link?.twitter && (
+                                    <Link
+                                        href={token.link.twitter}
+                                        target="_blank"
+                                    >
+                                        <div className="overflow-hidden border border-[#334155] rounded-[5px] py-2 px-3">
+                                            <div className="w-[24px] h-[24px] relative">
+                                                <Image
+                                                    src="/icons/twitter.svg"
+                                                    alt="twitter"
+                                                    fill
+                                                    sizes="any"
+                                                />
+                                            </div>
+                                        </div>
+                                    </Link>
+                                )}
+                                {token.link?.discord && (
+                                    <Link
+                                        href={token.link.discord}
+                                        target="_blank"
+                                    >
+                                        <div className="overflow-hidden border border-[#334155] rounded-[5px] py-2 px-3">
+                                            <div className="w-[24px] h-[24px] relative">
+                                                <Image
+                                                    src="/icons/medium.svg"
+                                                    alt="medium"
+                                                    fill
+                                                    sizes="any"
+                                                />
+                                            </div>
+                                        </div>
+                                    </Link>
+                                )}
+
+                                {token.link?.link1 && (
+                                    <Link
+                                        href={token.link.link1}
+                                        target="_blank"
+                                    >
+                                        <div className="overflow-hidden border border-[#334155] rounded-[5px] py-2 px-3">
+                                            <div className="w-[24px] h-[24px] relative">
+                                                <Image
+                                                    src="/icons/website.svg"
+                                                    alt="website"
+                                                    fill
+                                                    sizes="any"
+                                                />
+                                            </div>
+                                        </div>
+                                    </Link>
+                                )}
+                                {token.link?.link2 && (
+                                    <Link
+                                        href={token.link.link2}
+                                        target="_blank"
+                                    >
+                                        <div className="overflow-hidden border border-[#334155] rounded-[5px] py-2 px-3">
+                                            <div className="w-[24px] h-[24px] relative">
+                                                <Image
+                                                    src="/icons/website.svg"
+                                                    alt="website"
+                                                    fill
+                                                    sizes="any"
+                                                />
+                                            </div>
+                                        </div>
+                                    </Link>
+                                )}
+                            </div>
+                        </div>
                     </div>
-                    <div className="flex font-bold gap-8">
-                        <div>40m</div>
-                        <div>8 txns / 400 Vol</div>
-                    </div>
-                </div>
+                    <p className="text-[#94A3B8]">{token.desc}</p>
 
-                <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-                    <div className="relative h-6 flex items-center justify-center">
-                        <div className="absolute top-0 bottom-0 left-0 rounded-lg w-[15%] bg-[#0038ff]"></div>
+                    <div className="px-[18px] pb-[41px]">
+                        <div className="font-vortex grid grid-cols-1 md:grid-cols-3 gap-[18px] mb-[29px]">
+                            <div className="flex flex-col gap-4">
+                                <div className="md:text-[15px] 2xl:text-[20px] text-[#666666]">
+                                    Marketcap
+                                </div>
+                                <h1 className="md:text-[20px] 2xl:text-[25px]">
+                                    $
+                                    {token.parsedReserve > 0
+                                        ? calcMarketCap(token.lastPrice)
+                                        : 0}
+                                </h1>
+                            </div>
+                            <div className="text-center flex flex-col items-stretch justify-between gap-4">
+                                <div className="md:text-[15px] 2xl:text-[20px] text-[#666666]">
+                                    Liquidity
+                                </div>
+                                <h1 className="md:text-[20px] 2xl:text-[25px]">
+                                    ${calcLiquidity(token.parsedReserve)}
+                                </h1>
+                            </div>
+                            <div className="text-right flex flex-col items-stretch justify-between gap-4">
+                                <div className="md:text-[15px] 2xl:text-[20px] text-[#19FB9B]">
+                                    Created
+                                </div>
+                                <h1 className="md:text-[20px] 2xl:text-[25px]">
+                                    {timeDiff(token.timestamp)}
+                                </h1>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div className="text-[#19FB9B] mb-1 text-[15px] font-bold">
+                                {calcProgress(token.parsedReserve)}%
+                            </div>
+
+                            <div className="bg-white rounded-xl shadow-sm overflow-hidden">
+                                <div className="relative h-3 flex items-center justify-center">
+                                    <div
+                                        style={{
+                                            width: `${calcProgress(
+                                                token.parsedReserve
+                                            )}%`,
+                                        }}
+                                        className="absolute top-0 bottom-0 left-0 rounded-lg bg-[#0038ff]"
+                                    ></div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>

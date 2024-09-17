@@ -10,50 +10,62 @@ export default function Footer() {
                 </div>
 
                 <div className="text-center md:text-left">
-                    <div className="pb-4 text-[18px] font-bold">Home</div>
+                    <div className="pb-4 text-[18px] font-bold">Resource</div>
                     <div className="text-[#9A98B9] flex flex-col gap-4 text-[16px]">
-                        <div>About</div>
-                        <div>Solutions</div>
-                        <div>Document</div>
-                        <div>Guideline</div>
+                        <Link href="https://docs.pumppad.vip/" target="_blank">
+                            <div>Documents</div>
+                        </Link>
+                        <Link
+                            href="https://docs.pumppad.vip/practice-on-pump-pad/launching-for-builders"
+                            target="_blank"
+                        >
+                            <div>How to launch?</div>
+                        </Link>
+                        <Link
+                            href="https://docs.pumppad.vip/practice-on-pump-pad/participating-for-investors"
+                            target="_blank"
+                        >
+                            <div>How to buy?</div>
+                        </Link>
+                        <div>Privacy Policy</div>
+                        <div>Terms of Use</div>
                     </div>
                 </div>
 
                 <div>
                     <div className="pb-4 text-center md:text-left text-[18px] font-bold">
-                        Services
+                        Features
                     </div>
-                    <div className="text-[#9A98B9] grid grid-cols-2 text-left gap-4 text-[16px]">
-                        <div>AI Domain Master</div>
-                        <div>Website AI Creation</div>
-                        <div>Social Tools</div>
-                        <div>SAFU Dev</div>
-                        <div>Chatter Shield</div>
-                        <div>AI Audit</div>
-                        <div>Marketing</div>
-                        <div>VIP Package</div>
+                    <div className="text-[#9A98B9] grid grid-cols-1 text-left gap-4 text-[16px]">
+                        <Link href="/create">
+                            <div>Launch Token</div>
+                        </Link>
+                        <div>Buy/Sell Token</div>
+                        <div>Build Products</div>
                     </div>
                 </div>
             </div>
 
             <div>
-                <div className="flex items-center gap-5 border-gradient rounded-md p-3 mb-10">
-                    <div>Talk to us via Telegram</div>
-                    <div className="flex items-center justify-center gap-1 bg-[#111827] p-1.5">
-                        <h1 className="leading-0">Contact</h1>
-                        <div className="w-[24px] h-[24px] relative">
-                            <Image
-                                src="/icons/circle.svg"
-                                alt="circle"
-                                fill
-                                sizes="any"
-                            />
-                        </div>
-                        {/* <div>Contact</div> */}
-                        {/* <div> TODO
+                <Link href="https://t.me/pumppad" target="_blank">
+                    <div className="flex items-center gap-5 border-gradient rounded-md p-3 mb-10">
+                        <div>Talk to us via Telegram</div>
+                        <div className="flex items-center justify-center gap-1 bg-[#111827] p-1.5">
+                            <h1 className="leading-0">Contact</h1>
+                            <div className="w-[24px] h-[24px] relative">
+                                <Image
+                                    src="/icons/circle.svg"
+                                    alt="circle"
+                                    fill
+                                    sizes="any"
+                                />
+                            </div>
+                            {/* <div>Contact</div> */}
+                            {/* <div> TODO
                         </div> */}
+                        </div>
                     </div>
-                </div>
+                </Link>
 
                 <div className="flex gap-2 items-center justify-center md:justify-end">
                     <Link href="https://t.me/pumppad" target="_blank">
@@ -82,7 +94,7 @@ export default function Footer() {
                         </div>
                     </Link>
 
-                    <div className="border-gradient py-2 px-3 rounded-md">
+                    {/* <div className="border-gradient py-2 px-3 rounded-md">
                         <div className="w-[24px] h-[24px] relative">
                             <Image
                                 src="/icons/medium.svg"
@@ -91,7 +103,7 @@ export default function Footer() {
                                 sizes="any"
                             />
                         </div>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </div>

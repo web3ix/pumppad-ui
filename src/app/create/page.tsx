@@ -4,15 +4,21 @@ import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import { useCallback, useState, useRef } from "react";
 import CurveSdk from "@/sdk/Curve";
 import Image from "next/image";
+import Link from "next/link";
 import useConnect from "@/hooks/useConnect";
 import axios from "axios";
 import clsx from "clsx";
 import { sliceString } from "@/utils";
+import useReadonlyRpc from "@/hooks/useReadonlyRpc";
+import copy from "copy-to-clipboard";
+import { TwitterShareButton } from "react-share";
 
 export default function CreateToken() {
     const { publicKey, sendTransaction } = useWallet();
     const { connection } = useConnection();
     const { connect } = useConnect();
+
+    const readonlyRpc = useReadonlyRpc();
 
     const iconRef = useRef<HTMLInputElement>(null);
     const bannerRef = useRef<HTMLInputElement>(null);
@@ -41,6 +47,18 @@ export default function CreateToken() {
         link2?: string;
     }>({});
 
+    const [tokenomics, setTokenomics] = useState<{
+        name1?: string;
+        ratio1?: number;
+        recipient1?: string;
+        name2?: string;
+        ratio2?: number;
+        recipient2?: string;
+        name3?: string;
+        ratio3?: number;
+        recipient3?: string;
+    }>({});
+
     const [previewIcon, setPreviewIcon] = useState("");
     const [previewBanner, setPreviewBanner] = useState("");
 
@@ -54,8 +72,11 @@ export default function CreateToken() {
         if (!publicKey) return alert("Connect wallet first");
 
         console.log(name, symbol, description, icon);
-        if (!name || !symbol || !description || !icon)
-            return alert("Invalid params");
+        if (!name) return alert("Name is required");
+        if (!symbol) return alert("Symbol is required");
+        if (!description) return alert("Description is required");
+        if (!icon) return alert("Icon is required");
+        if (!banner) return alert("Banner is required");
 
         const sdk = new CurveSdk(connection);
 
@@ -70,9 +91,14 @@ export default function CreateToken() {
             formData.append("name", name);
             formData.append("description", description);
             formData.append("icon", icon);
+            formData.append("banner", banner);
 
             if (Object.keys(link)) {
                 formData.append("link", JSON.stringify(link));
+            }
+
+            if (Object.keys(tokenomics)) {
+                formData.append("tokenomics", JSON.stringify(tokenomics));
             }
 
             const res = await axios.post(
@@ -96,9 +122,7 @@ export default function CreateToken() {
                 maxRetries: 10,
             });
 
-            await connection.confirmTransaction(signature, "finalized");
-
-            // alert(`Created successful. Tx hash: ${signature}`);
+            await readonlyRpc.confirmTransaction(signature, "confirmed");
 
             setSubmitting(false);
 
@@ -141,8 +165,6 @@ export default function CreateToken() {
         },
         [setLink]
     );
-
-    console.log(link);
 
     return (
         <div className="px-[20px] flex flex-col items-stretch md:items-center gap-10 md:gap-20 relative mt-[60px] md:mt-20 mb-20">
@@ -229,14 +251,35 @@ export default function CreateToken() {
                                     <input
                                         className="border-gradient"
                                         placeholder="Name"
+                                        value={tokenomics.name1}
+                                        onChange={(e) =>
+                                            setTokenomics((pre) => ({
+                                                ...pre,
+                                                name1: e.target.value,
+                                            }))
+                                        }
                                     />
                                     <input
                                         className="border-gradient"
                                         placeholder="Ratio"
+                                        value={tokenomics.ratio1}
+                                        onChange={(e) =>
+                                            setTokenomics((pre) => ({
+                                                ...pre,
+                                                ratio1: +e.target.value,
+                                            }))
+                                        }
                                     />
                                     <input
                                         className="border-gradient"
                                         placeholder="Recipient Wallet"
+                                        value={tokenomics.recipient1}
+                                        onChange={(e) =>
+                                            setTokenomics((pre) => ({
+                                                ...pre,
+                                                recipient1: e.target.value,
+                                            }))
+                                        }
                                     />
                                 </div>
 
@@ -247,14 +290,35 @@ export default function CreateToken() {
                                     <input
                                         className="border-gradient"
                                         placeholder="Name"
+                                        value={tokenomics.name2}
+                                        onChange={(e) =>
+                                            setTokenomics((pre) => ({
+                                                ...pre,
+                                                name2: e.target.value,
+                                            }))
+                                        }
                                     />
                                     <input
                                         className="border-gradient"
                                         placeholder="Ratio"
+                                        value={tokenomics.ratio2}
+                                        onChange={(e) =>
+                                            setTokenomics((pre) => ({
+                                                ...pre,
+                                                ratio2: +e.target.value,
+                                            }))
+                                        }
                                     />
                                     <input
                                         className="border-gradient"
                                         placeholder="Recipient Wallet"
+                                        value={tokenomics.recipient2}
+                                        onChange={(e) =>
+                                            setTokenomics((pre) => ({
+                                                ...pre,
+                                                recipient2: e.target.value,
+                                            }))
+                                        }
                                     />
                                 </div>
 
@@ -265,14 +329,35 @@ export default function CreateToken() {
                                     <input
                                         className="border-gradient"
                                         placeholder="Name"
+                                        value={tokenomics.name3}
+                                        onChange={(e) =>
+                                            setTokenomics((pre) => ({
+                                                ...pre,
+                                                name3: e.target.value,
+                                            }))
+                                        }
                                     />
                                     <input
                                         className="border-gradient"
                                         placeholder="Ratio"
+                                        value={tokenomics.ratio3}
+                                        onChange={(e) =>
+                                            setTokenomics((pre) => ({
+                                                ...pre,
+                                                ratio3: +e.target.value,
+                                            }))
+                                        }
                                     />
                                     <input
                                         className="border-gradient"
                                         placeholder="Recipient Wallet"
+                                        value={tokenomics.recipient3}
+                                        onChange={(e) =>
+                                            setTokenomics((pre) => ({
+                                                ...pre,
+                                                recipient3: e.target.value,
+                                            }))
+                                        }
                                     />
                                 </div>
                             </div>
@@ -437,81 +522,121 @@ export default function CreateToken() {
                                     onClick={() => handleInputLink("twitter")}
                                     className="cursor-pointer flex md:flex-col items-center justify-center py-[18px] md:py-10 bg-[#06050E] border border-[#ffffff1f] rounded-xl gap-1.5"
                                 >
-                                    <div className="w-[24px] h-[24px] relative">
-                                        <Image
-                                            src="/icons/twitter1.svg"
-                                            alt="twitter1"
-                                            fill
-                                            sizes="any"
-                                        />
-                                    </div>
-                                    <div className="font-semibold md:text-[16px]">
-                                        Add Twitter
-                                    </div>
+                                    {link.twitter ? (
+                                        <div className="line-clamp-1 md:w-[97px] overflow-hidden  font-semibold md:text-[16px] truncate text-center">
+                                            {link.twitter}
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className="w-[24px] h-[24px] relative">
+                                                <Image
+                                                    src="/icons/twitter1.svg"
+                                                    alt="twitter1"
+                                                    fill
+                                                    sizes="any"
+                                                />
+                                            </div>
+                                            <div className="font-semibold md:text-[16px]">
+                                                Add Twitter
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                                 <div
                                     onClick={() => handleInputLink("telegram")}
                                     className="cursor-pointer flex md:flex-col items-center justify-center py-[18px] md:py-10 bg-[#06050E] border border-[#ffffff1f] rounded-xl gap-1.5"
                                 >
-                                    <div className="w-[24px] h-[24px] relative">
-                                        <Image
-                                            src="/icons/telegram1.svg"
-                                            alt="telegram1"
-                                            fill
-                                            sizes="any"
-                                        />
-                                    </div>
-                                    <div className="font-semibold md:text-[16px]">
-                                        Add Telegram
-                                    </div>
+                                    {link.telegram ? (
+                                        <div className="line-clamp-1 md:w-[97px] overflow-hidden  font-semibold md:text-[16px] truncate text-center">
+                                            {link.telegram}
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className="w-[24px] h-[24px] relative">
+                                                <Image
+                                                    src="/icons/telegram1.svg"
+                                                    alt="telegram1"
+                                                    fill
+                                                    sizes="any"
+                                                />
+                                            </div>
+                                            <div className="font-semibold md:text-[16px]">
+                                                Add Telegram
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                                 <div
                                     onClick={() => handleInputLink("discord")}
                                     className="cursor-pointer flex md:flex-col items-center justify-center py-[18px] md:py-10 bg-[#06050E] border border-[#ffffff1f] rounded-xl gap-1.5"
                                 >
-                                    <div className="w-[24px] h-[24px] relative">
-                                        <Image
-                                            src="/icons/discord1.svg"
-                                            alt="discord1"
-                                            fill
-                                            sizes="any"
-                                        />
-                                    </div>
-                                    <div className="font-semibold md:text-[16px]">
-                                        Add Discord
-                                    </div>
+                                    {link.discord ? (
+                                        <div className="line-clamp-1 md:w-[97px] overflow-hidden  font-semibold md:text-[16px] truncate text-center">
+                                            {link.discord}
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className="w-[24px] h-[24px] relative">
+                                                <Image
+                                                    src="/icons/discord1.svg"
+                                                    alt="discord1"
+                                                    fill
+                                                    sizes="any"
+                                                />
+                                            </div>
+                                            <div className="font-semibold md:text-[16px]">
+                                                Add Discord
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                                 <div
                                     onClick={() => handleInputLink("link1")}
                                     className="cursor-pointer flex md:flex-col items-center justify-center py-[18px] md:py-10 bg-[#06050E] border border-[#ffffff1f] rounded-xl gap-1.5"
                                 >
-                                    <div className="w-[24px] h-[24px] relative">
-                                        <Image
-                                            src="/icons/link.svg"
-                                            alt="link"
-                                            fill
-                                            sizes="any"
-                                        />
-                                    </div>
-                                    <div className="font-semibold md:text-[16px]">
-                                        Add Another Link
-                                    </div>
+                                    {link.link1 ? (
+                                        <div className="line-clamp-1 md:w-[97px] overflow-hidden  font-semibold md:text-[16px] truncate text-center">
+                                            {link.link1}
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className="w-[24px] h-[24px] relative">
+                                                <Image
+                                                    src="/icons/link.svg"
+                                                    alt="link"
+                                                    fill
+                                                    sizes="any"
+                                                />
+                                            </div>
+                                            <div className="font-semibold md:text-[16px]">
+                                                Add Another Link
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                                 <div
                                     onClick={() => handleInputLink("link2")}
                                     className="cursor-pointer flex md:flex-col items-center justify-center py-[18px] md:py-10 bg-[#06050E] border border-[#ffffff1f] rounded-xl gap-1.5"
                                 >
-                                    <div className="w-[24px] h-[24px] relative">
-                                        <Image
-                                            src="/icons/link.svg"
-                                            alt="link"
-                                            fill
-                                            sizes="any"
-                                        />
-                                    </div>
-                                    <div className="font-semibold md:text-[16px]">
-                                        Add Another Link
-                                    </div>
+                                    {link.link2 ? (
+                                        <div className="line-clamp-1 md:w-[97px] overflow-hidden  font-semibold md:text-[16px] truncate text-center">
+                                            {link.link2}
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <div className="w-[24px] h-[24px] relative">
+                                                <Image
+                                                    src="/icons/link.svg"
+                                                    alt="link"
+                                                    fill
+                                                    sizes="any"
+                                                />
+                                            </div>
+                                            <div className="font-semibold md:text-[16px]">
+                                                Add Another Link
+                                            </div>
+                                        </>
+                                    )}
                                 </div>
                             </div>
                         </div>
@@ -583,8 +708,7 @@ export default function CreateToken() {
                 </>
             ) : (
                 <div className="flex flex-col gap-[22px] items-center mt-5">
-                    <h1 className="text-[16px]">3.. 2.. 1..</h1>
-                    <h1 className="text-[32px]">Take off</h1>
+                    <h1 className="text-[32px]">We Are Live!</h1>
                     <div className="text-[15px]">
                         {token.symbol} is going live on Pumppad!
                     </div>
@@ -602,7 +726,10 @@ export default function CreateToken() {
                             <div className="text-[#94A3B8] font-medium max-w-[180px] md:max-w-full overflow-hidden text-ellipsis">
                                 {token.bond}
                             </div>
-                            <div className="cursor-pointer rounded-xl border border-[#334155] font-medium py-2 px-3">
+                            <div
+                                onClick={() => copy(token.bond)}
+                                className="cursor-pointer rounded-xl border border-[#334155] font-medium py-2 px-3"
+                            >
                                 Copy CA
                             </div>
                         </div>
@@ -610,6 +737,62 @@ export default function CreateToken() {
                         <p className="text-[#94A3B8] text-center md:px-[200px]">
                             {token.description}
                         </p>
+                    </div>
+
+                    <Link href={`/token/${token.bond}`}>
+                        <button className="btn-primary font-vortex text-[18px] py-4 min-w-[400px]">
+                            Go to my token page
+                        </button>
+                    </Link>
+
+                    <TwitterShareButton
+                        url={`${process.env.NEXT_PUBLIC_APP_URL}/token/${token.bond}`}
+                        title={`Trade ${token.symbol} on PumpPad now!`}
+                    >
+                        <div className="font-vortex btn-secondary font-vortex text-[18px] py-3 min-w-[400px] flex items-center justify-center gap-2">
+                            <div>Share on</div>
+                            <div className="w-[24px] h-[24px] relative">
+                                <Image
+                                    src="/icons/twitter.svg"
+                                    alt="twitter"
+                                    fill
+                                    sizes="any"
+                                />
+                            </div>
+                        </div>
+                    </TwitterShareButton>
+
+                    <div className="flex justify-between gap-20">
+                        <Link href="/">
+                            <div className="cursor-pointer flex items-center gap-2">
+                                <div className="w-[24px] h-[24px] relative">
+                                    <Image
+                                        src="/icons/arrow-left.svg"
+                                        alt="arrow-left"
+                                        fill
+                                        sizes="any"
+                                    />
+                                </div>
+                                <div className="font-medium">
+                                    Back to Homepage
+                                </div>
+                            </div>
+                        </Link>
+                        <Link href="/profile">
+                            <div className="cursor-pointer flex items-center gap-2">
+                                <div className="font-medium">
+                                    Manage my token
+                                </div>
+                                <div className="w-[24px] h-[24px] relative">
+                                    <Image
+                                        src="/icons/user.svg"
+                                        alt="user"
+                                        fill
+                                        sizes="any"
+                                    />
+                                </div>
+                            </div>
+                        </Link>
                     </div>
                 </div>
             )}

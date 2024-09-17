@@ -9,11 +9,21 @@ import CurveSdk from "@/sdk/Curve";
 import { BN } from "@coral-xyz/anchor";
 import { IToken, useAppStore } from "@/store";
 import useSWR from "swr";
-import { TOTAL_SUPPLY, calcProgress, fetcher, sliceString } from "@/utils";
+import {
+    TOTAL_SUPPLY,
+    calcProgress,
+    fetcher,
+    getSignatureUrl,
+    sliceString,
+} from "@/utils";
 import { PublicKey } from "@solana/web3.js";
 import useConnect from "@/hooks/useConnect";
 import clsx from "clsx";
 import TopTokenBar from "@/components/home/TopBar";
+import Link from "next/link";
+import dayjs from "dayjs";
+const relativeTime = require("dayjs/plugin/relativeTime");
+dayjs.extend(relativeTime);
 
 interface Holder {
     address: PublicKey;
@@ -58,6 +68,23 @@ export default function TokenDetailPage({
         })();
     }, [connection, data?.token]);
 
+    useEffect(() => {
+        if (!socket || !data || !mutate) return;
+
+        socket.on("new-trade", (payload) => {
+            console.log("🚀 New trade:", payload);
+            const exist = data.trades.find((trade) => trade.id === payload.id);
+
+            if (!exist) {
+                mutate({
+                    ...data,
+                    lastPrice: payload.lastPrice,
+                    trades: [...data.trades, payload],
+                });
+            }
+        });
+    }, [socket, data, mutate]);
+
     const handleTrade = useCallback(async () => {
         if (!data?.symbol) return;
 
@@ -69,28 +96,46 @@ export default function TokenDetailPage({
 
         try {
             await sdk.bootstrap();
-            const parsedAmount = new BN(+amount * 10 ** 9);
+            const parsedAmount = new BN(BigInt(+amount) * BigInt(10 ** 9));
 
             if (isBuy) {
-                const createTx = await sdk.buyToken(
-                    publicKey,
+                const { reserve: reserveToBuy } = await sdk.fetchReserveToBuy(
                     data.symbol,
                     parsedAmount
                 );
 
-                const txHash = await sendTransaction(createTx, connection, {
+                const maxReserveAmount = reserveToBuy.add(
+                    reserveToBuy.div(new BN("20"))
+                ); // slippage 5% // TODO by user settings
+
+                const buyTx = await sdk.buyToken(
+                    publicKey,
+                    data.symbol,
+                    parsedAmount,
+                    maxReserveAmount
+                );
+
+                const txHash = await sendTransaction(buyTx, connection, {
                     maxRetries: 10,
                 });
 
                 alert(`Buy successful. Tx hash: ${txHash}`);
             } else {
-                const createTx = await sdk.sellToken(
+                const { reserve: reserveForSell } =
+                    await sdk.fetchRefundForSell(data.symbol, parsedAmount);
+
+                const minReserveAmount = reserveForSell.sub(
+                    reserveForSell.div(new BN("20"))
+                ); // slippage 5% TODO by user settings
+
+                const sellTx = await sdk.sellToken(
                     publicKey,
                     data.symbol,
-                    parsedAmount
+                    parsedAmount,
+                    minReserveAmount
                 );
 
-                const txHash = await sendTransaction(createTx, connection, {
+                const txHash = await sendTransaction(sellTx, connection, {
                     maxRetries: 10,
                 });
 
@@ -98,7 +143,7 @@ export default function TokenDetailPage({
             }
         } catch (error: any) {
             console.log(
-                "🚀 ~ file: CreatePumpWithMe.tsx:87 ~ handleCreate ~ error:",
+                "🚀 ~ file: page.tsx:145 ~ handleTrade ~ error:",
                 error
             );
             alert(error?.message ?? error);
@@ -114,12 +159,12 @@ export default function TokenDetailPage({
                     <HighlightProject token={data} />
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-7 gap-10">
-                    <div className="hidden md:block md:col-span-4 rounded-[10px] overflow-hidden">
-                        {data?.symbol && <BondChart symbol={data.symbol} />}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+                    <div className="hidden md:block md:col-span-2 rounded-[10px] overflow-hidden">
+                        <BondChart symbol={data?.symbol} />
                     </div>
 
-                    <div className="md:col-span-3 border-gradient rounded-[10px] overflow-hidden px-[15px] md:p-0 pt-[17px] md:mt-0 pb-[31px] btn-normal2">
+                    <div className="border-gradient rounded-[10px] overflow-hidden px-[15px] md:p-0 pt-[17px] md:mt-0 pb-[31px] btn-normal2">
                         <div className="md:hidden text-[25px] flex gap-[35px]">
                             <h1
                                 className={clsx("cursor-pointer pb-2.5  ", {
@@ -143,9 +188,7 @@ export default function TokenDetailPage({
 
                         {isShowChart && (
                             <div className="md:hidden md:col-span-4 rounded-[10px] overflow-hidden">
-                                {data?.symbol && (
-                                    <BondChart symbol={data.symbol} />
-                                )}
+                                <BondChart symbol={data?.symbol} />
                             </div>
                         )}
 
@@ -304,47 +347,64 @@ export default function TokenDetailPage({
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-7 gap-10">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
                     {/* trade history */}
-                    <div className="hidden md:flex flex-col items-stretch row-span-2 md:col-span-4 py-8 px-6 rounded-[10px] btn-normal2">
+                    <div className="hidden md:flex flex-col items-stretch row-span-2 md:col-span-2 py-8 px-6 rounded-[10px] btn-normal2">
                         <h1 className="text-[40px]">Trading History</h1>
 
-                        <div className="grid grid-cols-10 text-[20px] mt-[30px] mb-[28px]">
+                        <div className="grid grid-cols-11 gap-2 2xl:text-[20px] mt-[30px] mb-[28px]">
                             <div className="col-span-2">Account</div>
                             <div>Type</div>
-                            <div>SOL</div>
+                            <div className="col-span-2">SOL</div>
                             <div className="col-span-2">DOGS</div>
                             <div className="col-span-2">Date</div>
-                            <div className="col-span-2">Transaction</div>
+                            <div className="col-span-2 text-right">
+                                Transaction
+                            </div>
                         </div>
 
                         <div className="h-[1px] bg-[#FFF]"></div>
 
-                        {data?.trades.map((trade, idx) => (
+                        {data?.trades?.map((trade, idx) => (
                             <div
                                 key={idx}
-                                className="grid grid-cols-10 mt-[35px]"
+                                className="grid grid-cols-11 gap-2 mt-[35px] 2xl:text-[20px]"
                             >
                                 <div className="col-span-2">
-                                    {sliceString(trade.doer, 4, 7)}
+                                    {sliceString(trade.doer, 4, 3)}
                                 </div>
-                                <div>{trade.isBuy ? "Buy" : "Sell"}</div>
-                                <div>{trade.parseAmount}</div>
+                                <div
+                                    className={clsx({
+                                        "text-[#19FB9B]": trade.isBuy,
+                                        "text-[#EC0105]": !trade.isBuy,
+                                    })}
+                                >
+                                    {trade.isBuy ? "Buy" : "Sell"}
+                                </div>
                                 <div className="col-span-2">
                                     {trade.parseReserveAmount}
                                 </div>
                                 <div className="col-span-2">
-                                    {trade.timestamp}
+                                    {trade.parseAmount}
                                 </div>
+
                                 <div className="col-span-2">
-                                    {sliceString(trade.signature, 4, 7)}
+                                    {/* @ts-ignore */}
+                                    {dayjs(trade.timestamp * 1000).fromNow()}
+                                </div>
+                                <div className="col-span-2 text-right">
+                                    <Link
+                                        href={getSignatureUrl(trade.signature)}
+                                    >
+                                        {sliceString(trade.signature, 4, 4)}
+                                    </Link>
                                 </div>
                             </div>
                         ))}
                     </div>
 
                     {/* holder distributor */}
-                    <div className="md:col-span-3 py-8 px-6 text-[20px] flex flex-col items-stretch gap-6 rounded-[10px] btn-normal2">
+                    <div className="py-8 px-6 text-[20px] flex flex-col items-stretch gap-6 rounded-[10px] btn-normal2">
                         <h1 className="md:text-[40px]">Holder Distribution</h1>
 
                         <div className="flex items-center justify-between">
@@ -374,7 +434,7 @@ export default function TokenDetailPage({
                     </div>
 
                     {/* chat */}
-                    <div className="md:col-span-3 py-8 px-6 flex flex-col items-stretch gap-6 rounded-[10px] btn-normal2">
+                    <div className="py-8 px-6 flex flex-col items-stretch gap-6 rounded-[10px] btn-normal2">
                         <h1 className="primary-text-gradient text-[30px]">
                             Pump Chat
                         </h1>

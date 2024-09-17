@@ -1,6 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
+import React from "react";
 import {
     ChartingLibraryWidgetOptions,
     ResolutionString,
@@ -14,7 +15,11 @@ const TVChartContainer = dynamic(
     { ssr: false }
 );
 
-export default function BondChart({ symbol }: { symbol: string }) {
+export default React.memo(function BondChart({
+    symbol,
+}: {
+    symbol: string | undefined;
+}) {
     const defaultWidgetProps: Partial<ChartingLibraryWidgetOptions> = {
         symbol: symbol,
         interval: "5" as ResolutionString,
@@ -29,5 +34,7 @@ export default function BondChart({ symbol }: { symbol: string }) {
         debug: false,
     };
 
+    if (!symbol) return null;
+
     return <TVChartContainer {...defaultWidgetProps} />;
-}
+});
