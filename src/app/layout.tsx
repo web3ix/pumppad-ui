@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     description:
         "Pump Pad is a multichain platform that streamlines token launching with comprehensive support and advanced security for seamless project deployment.",
     icons: {
-        icon: "https://pumppad.vip/logo.png",
+        icon: `${process.env.NEXT_PUBLIC_APP_URL}/logo.png`,
     },
     openGraph: {
         title: "PumpPad",
@@ -20,7 +20,7 @@ export const metadata: Metadata = {
         locale: "en_US",
         images: [
             {
-                url: "https://pumppad.vip/og.png",
+                url: `${process.env.NEXT_PUBLIC_APP_URL}/og.png`,
                 width: 1200,
                 height: 630,
                 alt: "Pump Pad is a multichain platform that streamlines token launching with comprehensive support and advanced security for seamless project deployment.",

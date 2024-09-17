@@ -371,8 +371,8 @@ export default function TokenDetailPage({
                                     <div className="text-[12px]">
                                         Balance:{" "}
                                         {isSolBuy
-                                            ? `${ethers.formatUnits(solBalance?.toString() ?? "0", 9)} SOL`
-                                            : `${ethers.formatUnits(curveBalance?.toString() ?? "0", 9)} ${data?.symbol} `}
+                                            ? `${numberWithCommas(ethers.formatUnits(solBalance?.toString() ?? "0", 9))} SOL`
+                                            : `${numberWithCommas(ethers.formatUnits(curveBalance?.toString() ?? "0", 9))} ${data?.symbol} `}
                                     </div>
                                 </div>
 
