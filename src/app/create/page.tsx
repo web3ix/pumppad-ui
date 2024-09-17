@@ -12,6 +12,8 @@ import { sliceString } from "@/utils";
 import useReadonlyRpc from "@/hooks/useReadonlyRpc";
 import copy from "copy-to-clipboard";
 import { TwitterShareButton } from "react-share";
+import { ethers } from "ethers";
+import { BN } from "@coral-xyz/anchor";
 
 export default function CreateToken() {
     const { publicKey, sendTransaction } = useWallet();
@@ -46,6 +48,7 @@ export default function CreateToken() {
         link1?: string;
         link2?: string;
     }>({});
+    const [initBuy, setInitBuy] = useState<string>("");
 
     const [tokenomics, setTokenomics] = useState<{
         name1?: string;
@@ -110,13 +113,29 @@ export default function CreateToken() {
                     },
                 }
             );
+            let payload = [];
 
-            const createTx = await sdk.createToken(
-                publicKey,
-                name,
-                symbol,
-                res.data
-            );
+            let createTx;
+
+            if (+initBuy > 0) {
+                const parsedAmount = new BN(ethers.parseUnits(initBuy, 9));
+                payload.push(parsedAmount);
+
+                createTx = await sdk.createToken(
+                    publicKey,
+                    name,
+                    symbol,
+                    res.data,
+                    parsedAmount
+                );
+            } else {
+                createTx = await sdk.createToken(
+                    publicKey,
+                    name,
+                    symbol,
+                    res.data
+                );
+            }
 
             const signature = await sendTransaction(createTx, connection, {
                 maxRetries: 10,
@@ -664,6 +683,11 @@ export default function CreateToken() {
                                 <input
                                     id="initBuy"
                                     className="border-gradient pl-[90px] pr-14 text-right"
+                                    value={initBuy}
+                                    onChange={(e) =>
+                                        !isNaN(+e.target.value) &&
+                                        setInitBuy(e.target.value)
+                                    }
                                 />
 
                                 <div className="cursor-pointer absolute right-[20px] top-1/2 -translate-y-1/2">

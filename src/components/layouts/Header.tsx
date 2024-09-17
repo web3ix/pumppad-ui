@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useWallet } from "@solana/wallet-adapter-react";
 import useConnect from "@/hooks/useConnect";
+import { Toaster } from "react-hot-toast";
 
 export default function Header() {
     const { publicKey } = useWallet();
@@ -10,11 +11,12 @@ export default function Header() {
 
     return (
         <div className="px-5 md:px-[120px] py-6 flex justify-between items-center relative">
+            <Toaster />
             <div className="md:hidden absolute top-0 left-0 right-0 bg-mobile-bg1 min-h-[390px] -z-50"></div>
             <div className="hidden md:block absolute top-0 left-0 right-0 bg-bg1 min-h-[1080px] -z-50"></div>
 
             <Link href="/">
-                <div className="cursor-pointer w-[208px] h-[47px] relative">
+                <div className="cursor-pointer w-[177px] h-[40px] md:w-[208px] md:h-[47px] relative">
                     <Image src="/logo-w-text.png" alt="logo" fill sizes="any" />
                 </div>
             </Link>

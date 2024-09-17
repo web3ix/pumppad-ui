@@ -23,8 +23,8 @@
 }
 
 ::-webkit-scrollbar {
-    width: 5px !important;
-    height: 5px !important;
+    width: 1px !important;
+    height: 1px !important;
 }
 
 /* Handle */
@@ -171,4 +171,18 @@ textarea {
         rgba(67, 56, 202, 0) 0%,
         rgba(67, 56, 202, 0.2) 100%
     );
+}
+
+.top-bar-item {
+    border-radius: 12px;
+    border: 1px solid #a9ace7;
+    background: radial-gradient(
+            111.42% 170.43% at 83.26% 142.62%,
+            rgba(38, 99, 254, 0) 79.1%,
+            rgba(53, 110, 255, 0.1) 100%
+        ),
+        rgba(0, 0, 0, 0.35);
+
+    /* 6 */
+    box-shadow: 0px 0px 20px 0px #356eff;
 }

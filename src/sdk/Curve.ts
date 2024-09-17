@@ -38,7 +38,7 @@ export default class CurveSdk {
     public WEI6 = new BN("1000000");
     public MULTI_FACTOR = new BN("1000000000");
     public MAX_SUPPLY = new BN("500000000").mul(this.MULTI_FACTOR);
-    public MAX_STEP = 48;
+    public MAX_STEP = 32;
 
     constructor(connection: Connection, programId: PublicKey = PROGRAM_ID) {
         this.connection = connection;
@@ -174,6 +174,89 @@ export default class CurveSdk {
         };
     }
 
+    async fetchAmountBuyFromReserve(symbol: string, reserve: BN): Promise<BN> {
+        if (reserve.eq(new BN(0))) throw new Error("Non zero to buy");
+
+        const mint = getMintAccountPubKey(
+            this.program,
+            this.configAccountPubKey,
+            symbol
+        );
+
+        const mintInfo = await this.connection.getParsedAccountInfo(mint);
+        if (!mintInfo.value) {
+            throw Error("Token doesn't exists with symbol");
+        }
+
+        const bondPda = getBondAccountPubKey(
+            this.program,
+            this.configAccountPubKey,
+            mint
+        );
+        const bondAccount =
+            await this.program.account.bondAccount.fetch(bondPda);
+
+        const fee = this.configAccountData.systemFee
+            .mul(reserve)
+            .div(this.WEI6);
+
+        let currentSupply = bondAccount.supplied;
+
+        let reserveLeft = reserve.sub(fee);
+        let amount = new BN(0);
+        let current_step = this.getCurrentStep(
+            currentSupply,
+            this.configAccountData.ranges
+        );
+
+        for (let i = current_step; i < this.MAX_STEP; i++) {
+            let supplyLeft =
+                this.configAccountData.ranges[i].sub(currentSupply);
+
+            let _reserveLeft = supplyLeft
+                .mul(this.configAccountData.prices[i])
+                .div(this.MULTI_FACTOR);
+
+            if (reserveLeft.gt(_reserveLeft)) {
+                if (supplyLeft.eq(new BN(0))) {
+                    continue;
+                }
+
+                // ensure reserve is calculated with ceiling
+                amount = amount.add(
+                    _reserveLeft
+                        .mul(this.MULTI_FACTOR)
+                        .div(this.configAccountData.prices[i])
+                );
+                currentSupply = currentSupply.add(supplyLeft);
+                reserveLeft = reserveLeft.sub(_reserveLeft);
+            } else {
+                // ensure reserve is calculated with ceiling
+                const supply = reserveLeft
+                    .mul(this.MULTI_FACTOR)
+                    .div(this.configAccountData.prices[i]);
+                amount = amount.add(supply);
+                currentSupply = currentSupply.add(supply);
+                reserveLeft = new BN(0);
+                break;
+            }
+        }
+
+        let newSupply = amount.add(currentSupply);
+        if (newSupply.gt(this.MAX_SUPPLY)) throw new Error("Exceed Max Supply");
+
+        // tokensLeft > 0 -> can never happen
+        // reserveToBond == 0 -> can happen if a user tries to mint within the free minting range, which is prohibited by design.
+        if (amount.eq(new BN(0)) || reserveLeft.gt(new BN(0)))
+            throw new Error("Invalid Token Amount");
+
+        // const fee = this.configAccountData.systemFee
+        //     .mul(reserveToBuy)
+        //     .div(this.WEI6);
+
+        return amount;
+    }
+
     async fetchRefundForSell(
         symbol: string,
         amount: BN
@@ -217,7 +300,7 @@ export default class CurveSdk {
             if (currentStep == 0) {
                 supplyLeft = currentSupply;
             } else {
-                currentSupply.sub(
+                supplyLeft = currentSupply.sub(
                     this.configAccountData.ranges[currentStep - 1]
                 );
             }
@@ -255,6 +338,90 @@ export default class CurveSdk {
             reserve: reserveFromBond.sub(fee),
             fee,
         };
+    }
+
+    async fetchAmountSellFromReserve(symbol: string, reserve: BN): Promise<BN> {
+        if (reserve.eq(new BN(0))) throw new Error("Non zero for sell");
+
+        const mint = getMintAccountPubKey(
+            this.program,
+            this.configAccountPubKey,
+            symbol
+        );
+
+        const mintInfo = await this.connection.getParsedAccountInfo(mint);
+        if (!mintInfo.value) {
+            throw Error("Token doesn't exists with symbol");
+        }
+
+        const bondPda = getBondAccountPubKey(
+            this.program,
+            this.configAccountPubKey,
+            mint
+        );
+        const bondAccount =
+            await this.program.account.bondAccount.fetch(bondPda);
+
+        const fee = this.configAccountData.systemFee
+            .mul(reserve)
+            .div(this.WEI6);
+
+        let currentSupply = bondAccount.supplied;
+
+        // if (amount.gt(currentSupply)) throw new Error("Exceed Max Supply");
+
+        // let tokenLeft = amount;
+        let reserveLeft = reserve.add(fee);
+        let amount = new BN(0);
+        // let reserveFromBond = new BN(0);
+        let currentStep = this.getCurrentStep(
+            currentSupply,
+            this.configAccountData.ranges
+        );
+
+        while (reserveLeft.gt(new BN(0))) {
+            let supplyLeft = new BN(0);
+            if (currentStep == 0) {
+                supplyLeft = currentSupply;
+            } else {
+                supplyLeft = currentSupply.sub(
+                    this.configAccountData.ranges[currentStep - 1]
+                );
+            }
+
+            let _reserveLeft = supplyLeft
+                .mul(this.configAccountData.prices[currentStep])
+                .div(this.MULTI_FACTOR);
+
+            if (reserveLeft.lt(_reserveLeft)) {
+                const supply = reserveLeft
+                    .mul(this.MULTI_FACTOR)
+                    .div(this.configAccountData.prices[currentStep]);
+                amount = amount.add(supply);
+                currentSupply = currentSupply.sub(supply);
+
+                reserveLeft = new BN(0);
+            } else {
+                amount = amount.add(supplyLeft);
+                currentSupply = currentSupply.sub(supplyLeft);
+
+                reserveLeft = reserveLeft.sub(_reserveLeft);
+            }
+
+            if (currentStep > 0) {
+                currentStep -= 1;
+            }
+        }
+
+        if (amount.gt(bondAccount.supplied))
+            throw new Error("Exceed Max Supply");
+
+        // tokensLeft > 0 -> can never happen
+        if (reserveLeft.gt(new BN(0))) {
+            throw new Error("Invalid token amount");
+        }
+
+        return amount;
     }
 
     async initialize(

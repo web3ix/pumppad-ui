@@ -7,6 +7,7 @@ import {
     calcMarketCap,
     calcPriceChange,
     getTokenUrl,
+    numberWithCommas,
     sliceString,
     timeDiff,
 } from "@/utils";
@@ -40,7 +41,7 @@ export default function HighlightProject({ token }: { token?: IToken }) {
                                 <div className="overflow-hidden border border-[#334155] rounded-[5px] py-2 px-3">
                                     <div className="w-[24px] h-[24px] relative">
                                         <Image
-                                            src="/icons/web.svg"
+                                            src="/icons/web2.svg"
                                             alt="website"
                                             fill
                                             sizes="any"
@@ -97,7 +98,7 @@ export default function HighlightProject({ token }: { token?: IToken }) {
                                 <div className="overflow-hidden border border-[#334155] rounded-[5px] py-2 px-3">
                                     <div className="w-[24px] h-[24px] relative">
                                         <Image
-                                            src="/icons/web.svg"
+                                            src="/icons/web2.svg"
                                             alt="website"
                                             fill
                                             sizes="any"
@@ -111,7 +112,7 @@ export default function HighlightProject({ token }: { token?: IToken }) {
                                 <div className="overflow-hidden border border-[#334155] rounded-[5px] py-2 px-3">
                                     <div className="w-[24px] h-[24px] relative">
                                         <Image
-                                            src="/icons/web.svg"
+                                            src="/icons/web2.svg"
                                             alt="website"
                                             fill
                                             sizes="any"
@@ -148,7 +149,7 @@ export default function HighlightProject({ token }: { token?: IToken }) {
                     </div>
                 </div>
 
-                <p className="text-[#94A3B8]">{token.desc}</p>
+                <p className="text-[#94A3B8] line-clamp-4">{token.desc}</p>
 
                 <Link href={`/token/${token.token}`}>
                     <div>
@@ -182,7 +183,9 @@ export default function HighlightProject({ token }: { token?: IToken }) {
                         <div className="md:text-[20px] 2xl:text-[40px] font-bold leading-[40px]">
                             $
                             {token.parsedReserve > 0
-                                ? calcMarketCap(token.lastPrice)
+                                ? numberWithCommas(
+                                      calcMarketCap(token.lastPrice)
+                                  )
                                 : 0}
                         </div>
                     </div>
@@ -191,7 +194,10 @@ export default function HighlightProject({ token }: { token?: IToken }) {
                             Liquidity
                         </div>
                         <div className="md:text-[20px] 2xl:text-[40px] font-bold leading-[40px]">
-                            ${calcLiquidity(token.parsedReserve)}
+                            $
+                            {numberWithCommas(
+                                calcLiquidity(token.parsedReserve)
+                            )}
                         </div>
                     </div>
                     <div className="flex flex-col items-stretch justify-between gap-6 p-[17px] bg-[#000000] box-shadow-stats border-gradient rounded-xl">

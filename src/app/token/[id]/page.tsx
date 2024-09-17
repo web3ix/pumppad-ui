@@ -10,18 +10,26 @@ import { BN } from "@coral-xyz/anchor";
 import { IToken, useAppStore } from "@/store";
 import useSWR from "swr";
 import {
+    TOTAL_SALE,
     TOTAL_SUPPLY,
+    calcLiquidity,
+    calcMarketCap,
     calcProgress,
     fetcher,
     getSignatureUrl,
+    numberWithCommas,
     sliceString,
 } from "@/utils";
-import { PublicKey } from "@solana/web3.js";
+import { PublicKey, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import useConnect from "@/hooks/useConnect";
 import clsx from "clsx";
 import TopTokenBar from "@/components/home/TopBar";
 import Link from "next/link";
 import dayjs from "dayjs";
+import { ethers } from "ethers";
+import { checkOrCreateAssociatedTokenAccount } from "@/sdk/utils";
+import { toast } from "react-hot-toast";
+
 const relativeTime = require("dayjs/plugin/relativeTime");
 dayjs.extend(relativeTime);
 
@@ -55,6 +63,11 @@ export default function TokenDetailPage({
     const [amount, setAmount] = useState<string>("");
     const [isShowChart, setIsShowChart] = useState<boolean>(false);
 
+    const [solBalance, setSolBalance] = useState<string | number>();
+    const [curveBalance, setCurveBalance] = useState<string | number>();
+    const [refresh, setRefresh] = useState<boolean>(false);
+    const [submitting, setSubmitting] = useState(false);
+
     useEffect(() => {
         (async () => {
             if (!connection || !data?.token) return;
@@ -67,6 +80,30 @@ export default function TokenDetailPage({
             } catch (error) {}
         })();
     }, [connection, data?.token]);
+
+    useEffect(() => {
+        (async () => {
+            if (!connection || !data?.token || !publicKey) return;
+
+            try {
+                // get sol balance
+                const balance = await connection.getBalance(publicKey);
+                setSolBalance(balance);
+
+                // set curve balance
+                const { ata } = await checkOrCreateAssociatedTokenAccount(
+                    connection,
+                    publicKey,
+                    publicKey,
+                    new PublicKey(data.token)
+                );
+
+                const curveBalance =
+                    await connection.getTokenAccountBalance(ata);
+                setCurveBalance(curveBalance.value.amount);
+            } catch (error) {}
+        })();
+    }, [connection, data?.token, publicKey, refresh]);
 
     useEffect(() => {
         if (!socket || !data || !mutate) return;
@@ -86,23 +123,41 @@ export default function TokenDetailPage({
     }, [socket, data, mutate]);
 
     const handleTrade = useCallback(async () => {
-        if (!data?.symbol) return;
+        if (!data?.symbol || submitting) return;
 
-        if (!connection || !publicKey) return alert("Connect wallet first");
+        if (!connection || !publicKey)
+            return toast.error("Connect wallet first");
+
+        if (isNaN(+amount) || !amount) return toast.error("Invalid amount");
 
         const sdk = new CurveSdk(connection);
 
-        if (isNaN(+amount)) return alert("Invalid amount");
-
         try {
             await sdk.bootstrap();
-            const parsedAmount = new BN(BigInt(+amount) * BigInt(10 ** 9));
+
+            const parsedAmount = new BN(ethers.parseUnits(amount, 9));
+
+            setSubmitting(true);
 
             if (isBuy) {
-                const { reserve: reserveToBuy } = await sdk.fetchReserveToBuy(
-                    data.symbol,
-                    parsedAmount
-                );
+                // if buy by sol
+                let amount = parsedAmount;
+                let reserveToBuy = new BN(0);
+                if (!isSolBuy) {
+                    const { reserve: _reserveToBuy } =
+                        await sdk.fetchReserveToBuy(data.symbol, parsedAmount);
+                    reserveToBuy = _reserveToBuy;
+                } else {
+                    reserveToBuy = parsedAmount;
+
+                    amount = await sdk.fetchAmountBuyFromReserve(
+                        data.symbol,
+                        reserveToBuy
+                    );
+                }
+
+                if (reserveToBuy.gt(new BN(solBalance)))
+                    return toast.error("Insufficient Balance");
 
                 const maxReserveAmount = reserveToBuy.add(
                     reserveToBuy.div(new BN("20"))
@@ -111,18 +166,41 @@ export default function TokenDetailPage({
                 const buyTx = await sdk.buyToken(
                     publicKey,
                     data.symbol,
-                    parsedAmount,
+                    amount,
                     maxReserveAmount
                 );
 
-                const txHash = await sendTransaction(buyTx, connection, {
-                    maxRetries: 10,
-                });
+                const signature = await sendTransaction(buyTx, connection);
+                await connection.confirmTransaction(signature, "confirmed");
 
-                alert(`Buy successful. Tx hash: ${txHash}`);
+                setSubmitting(false);
+                setRefresh((pre) => !pre);
+                toast.success("Buy successful!");
             } else {
-                const { reserve: reserveForSell } =
-                    await sdk.fetchRefundForSell(data.symbol, parsedAmount);
+                let amount = parsedAmount;
+                let reserveForSell = new BN(0);
+
+                if (!isSolBuy) {
+                    const { reserve: _reserveForSell } =
+                        await sdk.fetchRefundForSell(data.symbol, parsedAmount);
+
+                    reserveForSell = _reserveForSell;
+                } else {
+                    reserveForSell = parsedAmount;
+
+                    amount = await sdk.fetchAmountBuyFromReserve(
+                        data.symbol,
+                        reserveForSell
+                    );
+                }
+
+                if (amount.gt(new BN(curveBalance)))
+                    return toast.error("Insufficient Balance");
+
+                // TODO remove
+                const { reserve: _reserveForSell } =
+                    await sdk.fetchRefundForSell(data.symbol, amount);
+                reserveForSell = _reserveForSell;
 
                 const minReserveAmount = reserveForSell.sub(
                     reserveForSell.div(new BN("20"))
@@ -131,24 +209,34 @@ export default function TokenDetailPage({
                 const sellTx = await sdk.sellToken(
                     publicKey,
                     data.symbol,
-                    parsedAmount,
+                    amount,
                     minReserveAmount
                 );
 
-                const txHash = await sendTransaction(sellTx, connection, {
-                    maxRetries: 10,
-                });
+                const signature = await sendTransaction(sellTx, connection);
+                await connection.confirmTransaction(signature, "confirmed");
 
-                alert(`Sell successful. Tx hash: ${txHash}`);
+                setSubmitting(false);
+
+                setRefresh((pre) => !pre);
+                toast.success("Sell successful!");
             }
         } catch (error: any) {
-            console.log(
-                "🚀 ~ file: page.tsx:145 ~ handleTrade ~ error:",
-                error
-            );
-            alert(error?.message ?? error);
+            setSubmitting(false);
+            !error?.message.include("user rejected") &&
+                toast.error(error?.message ?? error);
         }
-    }, [connection, publicKey, amount, isBuy, isSolBuy, data?.symbol]);
+    }, [
+        connection,
+        publicKey,
+        amount,
+        isBuy,
+        isSolBuy,
+        data?.symbol,
+        solBalance,
+        curveBalance,
+        submitting,
+    ]);
 
     return (
         <>
@@ -227,7 +315,15 @@ export default function TokenDetailPage({
                             <div className="md:px-[34px] pb-[34px]">
                                 <div className="my-[17px] border-gradient p-[20px] rounded-[10px] grid grid-cols-1 gap-2 !bg-[#000]">
                                     <div className="flex items-center justify-between">
-                                        <div>Switch to DOGS</div>
+                                        <div
+                                            className="cursor-pointer"
+                                            onClick={() =>
+                                                setIsSolBuy((pre) => !pre)
+                                            }
+                                        >
+                                            Switch to{" "}
+                                            {isSolBuy ? data?.symbol : "Sol"}
+                                        </div>
                                         <div className="w-[30px] h-[30px] relative">
                                             <Image
                                                 src="/icons/settings.svg"
@@ -253,38 +349,77 @@ export default function TokenDetailPage({
                                             <div className="flex items-center gap-1.5">
                                                 <div className="w-[25px] h-[25px] relative">
                                                     <Image
-                                                        src="/icons/solana.svg"
+                                                        src={
+                                                            isSolBuy
+                                                                ? "/icons/solana.svg"
+                                                                : data?.icon
+                                                        }
                                                         alt="solana"
                                                         fill
                                                         sizes="any"
                                                     />
                                                 </div>
-                                                <h1 className="text-[24px] translate-y-[2px]">
-                                                    Sol
+                                                <h1 className="text-[24px] translate-y-[2px] max-w-[60px] overflow-hidden text-ellipsis">
+                                                    {isSolBuy
+                                                        ? "Sol"
+                                                        : data?.symbol}
                                                 </h1>
                                             </div>
                                         </div>
                                     </div>
 
                                     <div className="text-[12px]">
-                                        Balance: 100 SOL
+                                        Balance:{" "}
+                                        {isSolBuy
+                                            ? `${ethers.formatUnits(solBalance?.toString() ?? "0", 9)} SOL`
+                                            : `${ethers.formatUnits(curveBalance?.toString() ?? "0", 9)} ${data?.symbol} `}
                                     </div>
                                 </div>
 
                                 <div className="grid grid-cols-5 text-[12px] gap-1">
-                                    <h1 className="py-[18px] text-center rounded-md bg-[#0038FF]">
+                                    <h1
+                                        onClick={() => {
+                                            setIsSolBuy(true);
+                                            setAmount("0.5");
+                                        }}
+                                        className="cursor-pointer py-3 text-center rounded-md bg-[#0038FF]"
+                                    >
                                         0.5 SOL
                                     </h1>
-                                    <h1 className="py-[18px] text-center rounded-md bg-[#0038FF]">
+                                    <h1
+                                        onClick={() => {
+                                            setIsSolBuy(true);
+                                            setAmount("1");
+                                        }}
+                                        className="cursor-pointer py-3 text-center rounded-md bg-[#0038FF]"
+                                    >
                                         1 SOL
                                     </h1>
-                                    <h1 className="py-[18px] text-center rounded-md bg-[#0038FF]">
+                                    <h1
+                                        onClick={() => {
+                                            setIsSolBuy(true);
+                                            setAmount("5");
+                                        }}
+                                        className="cursor-pointer py-3 text-center rounded-md bg-[#0038FF]"
+                                    >
                                         5 SOL
                                     </h1>
-                                    <h1 className="py-[18px] text-center rounded-md bg-[#0038FF]">
+                                    <h1
+                                        onClick={() => {
+                                            setIsSolBuy(true);
+                                            setAmount("10");
+                                        }}
+                                        className="cursor-pointer py-3 text-center rounded-md bg-[#0038FF]"
+                                    >
                                         10 SOL
                                     </h1>
-                                    <h1 className="py-[18px]  text-center rounded-md bg-[#0038FF]">
+                                    <h1
+                                        onClick={() => {
+                                            setIsSolBuy(true);
+                                            setAmount("20");
+                                        }}
+                                        className="cursor-pointer py-3  text-center rounded-md bg-[#0038FF]"
+                                    >
                                         20 SOL
                                     </h1>
                                 </div>
@@ -309,7 +444,11 @@ export default function TokenDetailPage({
                                             onClick={handleTrade}
                                             className="w-full flex items-center justify-center gap-[11px] py-4 btn-primary"
                                         >
-                                            <span>Place trade</span>
+                                            <span>
+                                                {submitting
+                                                    ? "Submitting..."
+                                                    : "Place trade"}
+                                            </span>
                                         </button>
                                     )}
                                 </div>
@@ -317,14 +456,17 @@ export default function TokenDetailPage({
                                 <div className="grid grid-cols-1 gap-[14px]">
                                     <h1 className="text-[20px]">
                                         Bonding Curve Progress:{" "}
-                                        {calcProgress(data?.lastPrice ?? "", 2)}
+                                        {calcProgress(
+                                            data?.parsedReserve ?? "",
+                                            2
+                                        )}
                                         %
                                     </h1>
                                     <div className="bg-white rounded-xl shadow-sm overflow-hidden">
                                         <div className="relative h-6 flex items-center justify-center">
                                             <div
                                                 style={{
-                                                    width: `${calcProgress(data?.lastPrice ?? "", 0)}%`,
+                                                    width: `${calcProgress(data?.parsedReserve ?? "", 0)}%`,
                                                 }}
                                                 className="absolute top-0 bottom-0 left-0 rounded-lg bg-[#0038ff]"
                                             ></div>
@@ -332,14 +474,21 @@ export default function TokenDetailPage({
                                     </div>
 
                                     <p className="text-[12px] text-[#94A3B8]">
-                                        There are 791,091,991.89 {data?.symbol}{" "}
-                                        still available for sale in the bonding
-                                        curve and there are 293.82 SOL in the
-                                        bonding curve. When the market cap
-                                        reaches $ 83,588.11 all the liquidity
-                                        from the bonding curve will be deposited
-                                        into Raydium and burned. Progression
-                                        increases as the price goes up.
+                                        There are{" "}
+                                        {numberWithCommas(
+                                            TOTAL_SALE -
+                                                (data?.parsedSupplied ?? 0)
+                                        )}{" "}
+                                        {data?.symbol} still available for sale
+                                        in the bonding curve and there are{" "}
+                                        {numberWithCommas(data?.parsedReserve)}{" "}
+                                        SOL in the bonding curve. When the
+                                        market cap reaches $
+                                        {numberWithCommas(calcLiquidity(400))}{" "}
+                                        all the liquidity from the bonding curve
+                                        will be deposited into Raydium and
+                                        burned. Progression increases as the
+                                        price goes up.
                                     </p>
                                 </div>
                             </div>
@@ -356,7 +505,7 @@ export default function TokenDetailPage({
                             <div className="col-span-2">Account</div>
                             <div>Type</div>
                             <div className="col-span-2">SOL</div>
-                            <div className="col-span-2">DOGS</div>
+                            <div className="col-span-2">{data?.symbol}</div>
                             <div className="col-span-2">Date</div>
                             <div className="col-span-2 text-right">
                                 Transaction
@@ -365,7 +514,7 @@ export default function TokenDetailPage({
 
                         <div className="h-[1px] bg-[#FFF]"></div>
 
-                        {data?.trades?.map((trade, idx) => (
+                        {data?.trades?.slice(0, 10).map((trade, idx) => (
                             <div
                                 key={idx}
                                 className="grid grid-cols-11 gap-2 mt-[35px] 2xl:text-[20px]"
@@ -382,10 +531,18 @@ export default function TokenDetailPage({
                                     {trade.isBuy ? "Buy" : "Sell"}
                                 </div>
                                 <div className="col-span-2">
-                                    {trade.parseReserveAmount}
+                                    {numberWithCommas(
+                                        +parseFloat(
+                                            trade.parseReserveAmount.toString()
+                                        ).toFixed(6)
+                                    )}
                                 </div>
                                 <div className="col-span-2">
-                                    {trade.parseAmount}
+                                    {numberWithCommas(
+                                        +parseFloat(
+                                            trade.parseAmount.toString()
+                                        ).toFixed(4)
+                                    )}
                                 </div>
 
                                 <div className="col-span-2">
@@ -423,11 +580,17 @@ export default function TokenDetailPage({
                                     {sliceString(
                                         holder.address.toBase58(),
                                         4,
-                                        7
+                                        3
                                     )}
                                 </div>
                                 <div>
-                                    {(holder.uiAmount * 100) / TOTAL_SUPPLY}%
+                                    {
+                                        +(
+                                            (holder.uiAmount * 100) /
+                                            TOTAL_SUPPLY
+                                        ).toFixed(2)
+                                    }
+                                    %
                                 </div>
                             </div>
                         ))}

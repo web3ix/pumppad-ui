@@ -4,6 +4,7 @@ import {
     calcLiquidity,
     calcMarketCap,
     calcProgress,
+    numberWithCommas,
     timeDiff,
 } from "@/utils";
 import Image from "next/image";
@@ -12,12 +13,12 @@ import Link from "next/link";
 export default function ProjectItem({ token }: { token: IToken }) {
     return (
         <Link href={`/token/${token.token}`}>
-            <div className="relative">
+            <div className="relative h-full flex flex-col items-stretch">
                 <div className="border border-[#4338CA] rounded-t-[10px] overflow-hidden w-full h-[180px] relative">
                     <Image src={token.banner} alt="banner" fill sizes="any" />
                 </div>
-                <div className="-translate-y-10 flex flex-col p-6 gap-8 border-gradient !border-t-[#4338CA] rounded-xl bg-[#000]">
-                    <div className="flex gap-[13px]">
+                <div className="flex-1 -translate-y-10 flex flex-col items-stretch p-6 gap-8 border-gradient !border-t-[#4338CA] rounded-xl bg-[#000]">
+                    <div className="flex  gap-[13px]">
                         <div className="border border-[#334155] rounded-[10px] overflow-hidden w-[95px] h-[95px] relative">
                             <Image
                                 src={token.icon}
@@ -39,7 +40,7 @@ export default function ProjectItem({ token }: { token: IToken }) {
                                         <div className="overflow-hidden border border-[#334155] rounded-[5px] py-2 px-3">
                                             <div className="w-[24px] h-[24px] relative">
                                                 <Image
-                                                    src="/icons/web.svg"
+                                                    src="/icons/web2.svg"
                                                     alt="website"
                                                     fill
                                                     sizes="any"
@@ -108,7 +109,7 @@ export default function ProjectItem({ token }: { token: IToken }) {
                                         <div className="overflow-hidden border border-[#334155] rounded-[5px] py-2 px-3">
                                             <div className="w-[24px] h-[24px] relative">
                                                 <Image
-                                                    src="/icons/web.svg"
+                                                    src="/icons/web2.svg"
                                                     alt="website"
                                                     fill
                                                     sizes="any"
@@ -125,7 +126,7 @@ export default function ProjectItem({ token }: { token: IToken }) {
                                         <div className="overflow-hidden border border-[#334155] rounded-[5px] py-2 px-3">
                                             <div className="w-[24px] h-[24px] relative">
                                                 <Image
-                                                    src="/icons/web.svg"
+                                                    src="/icons/web2.svg"
                                                     alt="website"
                                                     fill
                                                     sizes="any"
@@ -137,7 +138,9 @@ export default function ProjectItem({ token }: { token: IToken }) {
                             </div>
                         </div>
                     </div>
-                    <p className="text-[#94A3B8]">{token.desc}</p>
+                    <p className="text-[#94A3B8] line-clamp-3 min-h-[63px]">
+                        {token.desc}
+                    </p>
 
                     <div className="px-[18px] pb-[41px]">
                         <div className="font-vortex grid grid-cols-1 md:grid-cols-3 gap-[18px] mb-[29px]">
@@ -148,7 +151,9 @@ export default function ProjectItem({ token }: { token: IToken }) {
                                 <h1 className="md:text-[20px] 2xl:text-[25px]">
                                     $
                                     {token.parsedReserve > 0
-                                        ? calcMarketCap(token.lastPrice)
+                                        ? numberWithCommas(
+                                              calcMarketCap(token.lastPrice)
+                                          )
                                         : 0}
                                 </h1>
                             </div>
@@ -157,7 +162,10 @@ export default function ProjectItem({ token }: { token: IToken }) {
                                     Liquidity
                                 </div>
                                 <h1 className="md:text-[20px] 2xl:text-[25px]">
-                                    ${calcLiquidity(token.parsedReserve)}
+                                    $
+                                    {numberWithCommas(
+                                        calcLiquidity(token.parsedReserve)
+                                    )}
                                 </h1>
                             </div>
                             <div className="text-right flex flex-col items-stretch justify-between gap-4">

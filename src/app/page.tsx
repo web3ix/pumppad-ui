@@ -6,7 +6,7 @@ import SupportNetwork from "@/components/home/SupportNetwork";
 import TopTokenBar from "@/components/home/TopBar";
 import useConnect from "@/hooks/useConnect";
 import { IToken, ITrade, useAppStore } from "@/store";
-import { fetcher } from "@/utils";
+import { fetcher, sliceString } from "@/utils";
 import { useWallet } from "@solana/wallet-adapter-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -61,16 +61,15 @@ export default function Home() {
                 </h1>
                 <div className="text-center text-[15px] md:text-[20px] text-[#94A3B8]">
                     <div className="mb-2">
-                        From Building to Launching in just a few steps
+                        From building to launching in just a few steps
                     </div>
-                    <div>Powered by DEVHUB AI</div>
                 </div>
-                <div className="flex flex-col gap-[22px] font-vortex">
+                <div className="flex flex-col gap-5 font-vortex">
                     <div className="flex flex-col md:flex-row items-center justify-center gap-5">
                         {!publicKey && (
                             <button
                                 onClick={connect}
-                                className="flex items-center gap-[11px] py-2.5 px-6 btn-primary"
+                                className="flex items-center justify-center gap-[11px] py-4 min-w-[305px] btn-primary"
                             >
                                 <span>Connect wallet</span>
                                 <div className="w-[18px] h-[18px] relative">
@@ -85,8 +84,10 @@ export default function Home() {
                         )}
 
                         <Link href="/create">
-                            <button className="flex items-center gap-[11px] py-2.5 px-[18px] btn-secondary">
-                                <span> Launch your token now</span>
+                            <button className="flex items-center justify-center gap-[11px] py-4 min-w-[305px] btn-secondary">
+                                <h1 className="text-18px">
+                                    Launch your token now
+                                </h1>
                                 <div className="w-[18px] h-[18px] relative">
                                     <Image
                                         src="/icons/launch.svg"
@@ -99,7 +100,7 @@ export default function Home() {
                         </Link>
 
                         <Link href="https://t.me/pump_agent" target="_blank">
-                            <button className="hidden md:flex items-center gap-[11px] py-2 px-6 btn-primary">
+                            <button className="hidden md:flex items-center justify-center gap-[11px] py-4 min-w-[305px] btn-primary">
                                 <span>Product order</span>
                                 <div className="w-[18px] h-[18px] relative">
                                     <Image
@@ -113,12 +114,12 @@ export default function Home() {
                         </Link>
                     </div>
 
-                    <div className="flex flex-wrap justify-center gap-[19px] text-[#000000]">
+                    <div className="flex flex-wrap justify-center gap-5 text-[#000000]">
                         <Link
                             href="https://docs.pumppad.vip/practice-on-pump-pad/launching-for-builders"
                             target="_blank"
                         >
-                            <button className="flex items-center justify-center gap-[11px] p-2.5 btn-normal">
+                            <button className="flex items-center justify-center gap-[11px]  py-4 min-w-[305px] btn-normal">
                                 <span> How to launch</span>
                                 <div className="w-[18px] h-[18px] relative">
                                     <Image
@@ -131,8 +132,13 @@ export default function Home() {
                             </button>
                         </Link>
 
-                        <Link href="https://t.me/pump_agent" target="_blank">
-                            <button className="flex items-center justify-center gap-[11px] p-2.5 btn-normal">
+                        <Link
+                            href="https://t.me/pump_agent"
+                            target="_blank"
+                            passHref
+                            legacyBehavior
+                        >
+                            <button className="flex md:hidden items-center justify-center gap-[11px]  py-4 min-w-[305px] btn-normal">
                                 <span>Product order</span>
                                 <div className="w-[18px] h-[18px] relative">
                                     <Image
@@ -146,7 +152,7 @@ export default function Home() {
                         </Link>
 
                         <Link href="https://t.me/pump_agent" target="_blank">
-                            <button className="flex md:hidden items-center justify-center gap-[11px] p-2.5 btn-normal">
+                            <button className="flex items-center justify-center gap-[11px]  py-4 min-w-[305px] btn-normal">
                                 <span>Agent support</span>
                                 <div className="w-[18px] h-[18px] relative">
                                     <Image
@@ -216,35 +222,113 @@ export default function Home() {
             {/* Filters */}
             <div className="w-full">
                 <div className="w-full max-w-full flex gap-2 items-center overflow-x-scroll">
-                    <button className="min-w-[140px] 2xl:min-w-[250px] font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#0038FF]">
-                        Trending
+                    <button className="flex items-center justify-center gap-[11px] min-w-[200px] px-4 2xl:min-w-[250px] py-4 rounded-md bg-[#0038FF]">
+                        <h1 className="text-[18px]">Trending</h1>
+                        <div className="w-[20px] h-[20px] relative">
+                            <Image
+                                src="/icons/trending.svg"
+                                alt="trending"
+                                fill
+                                sizes="any"
+                            />
+                        </div>
                     </button>
-                    <button className="min-w-[140px] 2xl:min-w-[250px] font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
-                        Top
+                    <button className="flex items-center justify-center gap-[11px] min-w-[200px] px-4 2xl:min-w-[250px] py-4 rounded-md bg-[#000000] box-shadow-stats border-gradient">
+                        <h1 className="text-[18px]">Top</h1>
+                        <div className="w-[20px] h-[20px] relative">
+                            <Image
+                                src="/icons/star.svg"
+                                alt="star"
+                                fill
+                                sizes="any"
+                            />
+                        </div>
                     </button>
-                    <button className="min-w-[140px] 2xl:min-w-[250px] font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
-                        Rasing
+                    <button className="flex items-center justify-center gap-[11px] min-w-[200px] px-4 2xl:min-w-[250px] py-4 rounded-md bg-[#000000] box-shadow-stats border-gradient">
+                        <h1 className="text-[18px]">Raising</h1>
+                        <div className="w-[20px] h-[20px] relative">
+                            <Image
+                                src="/icons/raising.svg"
+                                alt="raising"
+                                fill
+                                sizes="any"
+                            />
+                        </div>
                     </button>
-                    <button className="min-w-[140px] 2xl:min-w-[250px] font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
-                        New
+                    <button className="flex items-center justify-center gap-[11px] min-w-[200px] px-4 2xl:min-w-[250px] py-4 rounded-md bg-[#000000] box-shadow-stats border-gradient">
+                        <h1 className="text-[18px]">New</h1>
+                        <div className="w-[20px] h-[20px] relative">
+                            <Image
+                                src="/icons/new.svg"
+                                alt="new"
+                                fill
+                                sizes="any"
+                            />
+                        </div>
                     </button>
-                    <button className="min-w-[140px] 2xl:min-w-[250px] font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
-                        Finished
+
+                    <button className="flex items-center justify-center gap-[11px] min-w-[200px] px-4 2xl:min-w-[250px] py-4 rounded-md bg-[#000000] box-shadow-stats border-gradient">
+                        <h1 className="text-[18px]">Finished</h1>
+                        <div className="w-[20px] h-[20px] relative">
+                            <Image
+                                src="/icons/mark.svg"
+                                alt="mark"
+                                fill
+                                sizes="any"
+                            />
+                        </div>
                     </button>
-                    <input
-                        className="min-w-[200px] flex-1 col-span-2 font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient"
-                        placeholder="Search"
-                    />
+
+                    <div className="flex-1 relative">
+                        <div className="absolute top-1/2 left-[24px] -translate-y-1/2">
+                            <div className="w-[20px] h-[20px] relative">
+                                <Image
+                                    src="/icons/search.svg"
+                                    alt="search"
+                                    fill
+                                    sizes="any"
+                                />
+                            </div>
+                        </div>
+                        <input
+                            className="pl-14 min-w-[200px] col-span-2 font-vortex md:block py-4 rounded-md text-[20px] font-semibold bg-[#000000] box-shadow-stats border-gradient"
+                            placeholder="Search"
+                        />
+                    </div>
                 </div>
-                <div className="w-full max-w-full flex gap-2 items-center mt-2 overflow-x-scroll">
-                    <button className="min-w-[140px] 2xl:min-w-[250px] font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
-                        Age
+                <div className="w-full max-w-full h-full flex gap-2 items-center mt-2 overflow-x-scroll">
+                    <button className="flex items-center justify-center gap-[11px] min-w-[200px] px-4 2xl:min-w-[250px] py-4 rounded-md bg-[#000000] box-shadow-stats border-gradient">
+                        <h1 className="text-[18px]">Age</h1>
+                        <div className="w-[20px] h-[20px] relative">
+                            <Image
+                                src="/icons/arrow-down.svg"
+                                alt="arrow-down"
+                                fill
+                                sizes="any"
+                            />
+                        </div>
                     </button>
-                    <button className="min-w-[140px] 2xl:min-w-[250px] font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
-                        Min progress
+                    <button className="flex items-center justify-center gap-[11px] min-w-[200px] px-4 2xl:min-w-[250px] py-4 rounded-md bg-[#000000] box-shadow-stats border-gradient">
+                        <h1 className="text-[18px]">Min progress</h1>
+                        <div className="w-[20px] h-[20px] relative">
+                            <Image
+                                src="/icons/arrow-down.svg"
+                                alt="arrow-down"
+                                fill
+                                sizes="any"
+                            />
+                        </div>
                     </button>
-                    <button className="min-w-[140px] 2xl:min-w-[250px] font-vortex md:block py-4 rounded-md text-sm font-semibold bg-[#000000] box-shadow-stats border-gradient">
-                        max progress
+                    <button className="flex items-center justify-center gap-[11px] min-w-[200px] px-4 2xl:min-w-[250px] py-4 rounded-md bg-[#000000] box-shadow-stats border-gradient">
+                        <h1 className="text-[18px]">Max progress</h1>
+                        <div className="w-[20px] h-[20px] relative">
+                            <Image
+                                src="/icons/arrow-down.svg"
+                                alt="arrow-down"
+                                fill
+                                sizes="any"
+                            />
+                        </div>
                     </button>
                 </div>
             </div>
