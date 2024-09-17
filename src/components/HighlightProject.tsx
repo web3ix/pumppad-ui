@@ -24,7 +24,7 @@ export default function HighlightProject({ token }: { token?: IToken }) {
 
     return (
         <div className="w-full flex flex-col md:flex-row p-6 gap-7 border-gradient rounded-2xl bg-[#000]">
-            <div className="border border-[#334155] rounded-2xl overflow-hidden w-full pt-[125%] md:w-[280px] md:pt-[400px] relative">
+            <div className="border border-[#334155] rounded-2xl overflow-hidden w-full pt-[166%] md:w-[300px] md:pt-[400px] relative">
                 <Image src={token.icon} alt="icon" fill sizes="any" />
             </div>
 

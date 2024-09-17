@@ -243,7 +243,20 @@ export default function TokenDetailPage({
 
             <div className="px-5 md:px-[120px] my-10 flex flex-col gap-10 items-stretch">
                 <div className="mt-10">
-                    <HighlightProject token={data} />
+                    {data?.banner && (
+                        <div className="border border-[#4338CA] rounded-t-[10px] overflow-hidden w-full pt-[27%] relative">
+                            <Image
+                                src={data.banner}
+                                alt="banner"
+                                fill
+                                sizes="any"
+                            />
+                        </div>
+                    )}
+
+                    <div className="flex-1 -translate-y-10">
+                        <HighlightProject token={data} />
+                    </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
