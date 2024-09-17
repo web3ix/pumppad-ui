@@ -299,7 +299,11 @@ export default function TokenDetailPage({
                         >
                             <div className="text-[15px] leading-[24px] grid grid-cols-2 text-center">
                                 <h1
-                                    onClick={() => setIsBuy(true)}
+                                    onClick={() => {
+                                        setIsSolBuy(true);
+                                        setIsBuy(true);
+                                        setAmount("");
+                                    }}
                                     className={clsx(
                                         "cursor-pointer py-[18px] backdrop-blur-md",
                                         {
@@ -311,7 +315,11 @@ export default function TokenDetailPage({
                                     Buy
                                 </h1>
                                 <h1
-                                    onClick={() => setIsBuy(false)}
+                                    onClick={() => {
+                                        setIsSolBuy(false);
+                                        setIsBuy(false);
+                                        setAmount("");
+                                    }}
                                     className={clsx(
                                         "cursor-pointer py-[18px] backdrop-blur-md",
                                         {
@@ -380,7 +388,24 @@ export default function TokenDetailPage({
                                         </div>
                                     </div>
 
-                                    <div className="text-[12px]">
+                                    <div
+                                        className="text-[12px]"
+                                        onClick={() => {
+                                            setAmount(
+                                                isSolBuy
+                                                    ? ethers.formatUnits(
+                                                          solBalance?.toString() ??
+                                                              "0",
+                                                          9
+                                                      )
+                                                    : ethers.formatUnits(
+                                                          curveBalance?.toString() ??
+                                                              "0",
+                                                          9
+                                                      )
+                                            );
+                                        }}
+                                    >
                                         Balance:{" "}
                                         {isSolBuy
                                             ? `${numberWithCommas(ethers.formatUnits(solBalance?.toString() ?? "0", 9))} SOL`
@@ -388,53 +413,113 @@ export default function TokenDetailPage({
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-5 text-[12px] gap-1">
-                                    <h1
-                                        onClick={() => {
-                                            setIsSolBuy(true);
-                                            setAmount("0.5");
-                                        }}
-                                        className="cursor-pointer py-3 text-center rounded-md bg-[#0038FF]"
-                                    >
-                                        0.5 SOL
-                                    </h1>
-                                    <h1
-                                        onClick={() => {
-                                            setIsSolBuy(true);
-                                            setAmount("1");
-                                        }}
-                                        className="cursor-pointer py-3 text-center rounded-md bg-[#0038FF]"
-                                    >
-                                        1 SOL
-                                    </h1>
-                                    <h1
-                                        onClick={() => {
-                                            setIsSolBuy(true);
-                                            setAmount("5");
-                                        }}
-                                        className="cursor-pointer py-3 text-center rounded-md bg-[#0038FF]"
-                                    >
-                                        5 SOL
-                                    </h1>
-                                    <h1
-                                        onClick={() => {
-                                            setIsSolBuy(true);
-                                            setAmount("10");
-                                        }}
-                                        className="cursor-pointer py-3 text-center rounded-md bg-[#0038FF]"
-                                    >
-                                        10 SOL
-                                    </h1>
-                                    <h1
-                                        onClick={() => {
-                                            setIsSolBuy(true);
-                                            setAmount("20");
-                                        }}
-                                        className="cursor-pointer py-3  text-center rounded-md bg-[#0038FF]"
-                                    >
-                                        20 SOL
-                                    </h1>
-                                </div>
+                                {isBuy ? (
+                                    <div className="grid grid-cols-5 text-[12px] gap-1">
+                                        <h1
+                                            onClick={() => {
+                                                setIsSolBuy(true);
+                                                setAmount("0.5");
+                                            }}
+                                            className="cursor-pointer py-3 text-center rounded-md bg-[#0038FF]"
+                                        >
+                                            0.5 SOL
+                                        </h1>
+                                        <h1
+                                            onClick={() => {
+                                                setIsSolBuy(true);
+                                                setAmount("1");
+                                            }}
+                                            className="cursor-pointer py-3 text-center rounded-md bg-[#0038FF]"
+                                        >
+                                            1 SOL
+                                        </h1>
+                                        <h1
+                                            onClick={() => {
+                                                setIsSolBuy(true);
+                                                setAmount("5");
+                                            }}
+                                            className="cursor-pointer py-3 text-center rounded-md bg-[#0038FF]"
+                                        >
+                                            5 SOL
+                                        </h1>
+                                        <h1
+                                            onClick={() => {
+                                                setIsSolBuy(true);
+                                                setAmount("10");
+                                            }}
+                                            className="cursor-pointer py-3 text-center rounded-md bg-[#0038FF]"
+                                        >
+                                            10 SOL
+                                        </h1>
+                                        <h1
+                                            onClick={() => {
+                                                setIsSolBuy(true);
+                                                setAmount("20");
+                                            }}
+                                            className="cursor-pointer py-3  text-center rounded-md bg-[#0038FF]"
+                                        >
+                                            20 SOL
+                                        </h1>
+                                    </div>
+                                ) : (
+                                    <div className="grid grid-cols-3 text-[12px] gap-1">
+                                        <h1
+                                            onClick={() => {
+                                                setIsSolBuy(false);
+                                                setAmount(
+                                                    ethers.formatUnits(
+                                                        new BN(
+                                                            curveBalance?.toString() ??
+                                                                "0"
+                                                        )
+                                                            .div(new BN(4))
+                                                            .toString(),
+                                                        9
+                                                    )
+                                                );
+                                            }}
+                                            className="cursor-pointer py-3 text-center rounded-md bg-[#0038FF]"
+                                        >
+                                            25%
+                                        </h1>
+                                        <h1
+                                            onClick={() => {
+                                                setIsSolBuy(false);
+                                                setAmount(
+                                                    ethers.formatUnits(
+                                                        new BN(
+                                                            curveBalance?.toString() ??
+                                                                "0"
+                                                        )
+                                                            .div(new BN(2))
+                                                            .toString(),
+                                                        9
+                                                    )
+                                                );
+                                            }}
+                                            className="cursor-pointer py-3 text-center rounded-md bg-[#0038FF]"
+                                        >
+                                            50%
+                                        </h1>
+                                        <h1
+                                            onClick={() => {
+                                                setIsSolBuy(false);
+                                                setAmount(
+                                                    ethers.formatUnits(
+                                                        new BN(
+                                                            curveBalance?.toString() ??
+                                                                "0"
+                                                        ).toString(),
+                                                        9
+                                                    )
+                                                );
+                                            }}
+                                            className="cursor-pointer py-3 text-center rounded-md bg-[#0038FF]"
+                                        >
+                                            100%
+                                        </h1>
+                                    </div>
+                                )}
                                 <div className="mt-[17px] mb-[25px] font-vortex">
                                     {!publicKey ? (
                                         <button
