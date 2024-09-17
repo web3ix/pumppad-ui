@@ -14,6 +14,7 @@ import copy from "copy-to-clipboard";
 import { TwitterShareButton } from "react-share";
 import { ethers } from "ethers";
 import { BN } from "@coral-xyz/anchor";
+import { toast } from "react-hot-toast";
 
 export default function CreateToken() {
     const { publicKey, sendTransaction } = useWallet();
@@ -72,14 +73,14 @@ export default function CreateToken() {
 
     const handleCreate = useCallback(async () => {
         if (!connection || submitting) return;
-        if (!publicKey) return alert("Connect wallet first");
+        if (!publicKey) return toast.error("Connect wallet first");
 
         console.log(name, symbol, description, icon);
-        if (!name) return alert("Name is required");
-        if (!symbol) return alert("Symbol is required");
-        if (!description) return alert("Description is required");
-        if (!icon) return alert("Icon is required");
-        if (!banner) return alert("Banner is required");
+        if (!name) return toast.error("Name is required");
+        if (!symbol) return toast.error("Symbol is required");
+        if (!description) return toast.error("Description is required");
+        if (!icon) return toast.error("Icon is required");
+        if (!banner) return toast.error("Banner is required");
 
         const sdk = new CurveSdk(connection);
 
@@ -153,12 +154,9 @@ export default function CreateToken() {
                 bond: sdk.getTokenPda(symbol).toString(),
             });
         } catch (error: any) {
-            console.log(
-                "🚀 ~ file: CreatePumpWithMe.tsx:87 ~ handleCreate ~ error:",
-                error
-            );
             setSubmitting(false);
-            alert(error?.message ?? error);
+            !error?.message?.includes("user rejected") &&
+                toast.error(error?.message ?? error);
         }
     }, [
         connection,
