@@ -22,17 +22,17 @@ export default function Header() {
             </Link>
 
             <div className="items-center justify-center hidden md:flex gap-10 text-[#94A3B8] text-sm">
-                <Link href="/solutions">
-                    <h1>Solutions</h1>
+                <Link href="/">
+                    <h1>Home</h1>
                 </Link>
-                <Link href="/vip-package">
-                    <h1>VIP Package</h1>
+                <Link href="/create">
+                    <h1>Launch</h1>
                 </Link>
-                <Link href="/tokenomics">
-                    <h1>Tokenomics</h1>
+                <Link href="https://t.me/pumppad" target="_blank">
+                    <h1>Telegram</h1>
                 </Link>
-                <Link href="/roadmap">
-                    <h1>Roadmap</h1>
+                <Link href="https://x.com/pumppad_vip" target="_blank">
+                    <h1>Twitter</h1>
                 </Link>
             </div>
 
