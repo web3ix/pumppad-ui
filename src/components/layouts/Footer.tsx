@@ -5,7 +5,7 @@ export default function Footer() {
     return (
         <div className="px-5 md:px-[120px] py-[48px] flex flex-col md:flex-row justify-between items-center md:items-start gap-8">
             <div className="flex flex-col md:flex-row gap-8 md:gap-10 xl:gap-20 2xl:gap-[120px] items-center md:items-start">
-                <div className="w-[120px] h-[32px] relative">
+                <div className="w-[194px] h-[44px] relative">
                     <Image src="/logo-w-text.png" alt="logo" fill sizes="any" />
                 </div>
 

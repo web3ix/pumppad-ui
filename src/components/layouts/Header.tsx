@@ -14,7 +14,7 @@ export default function Header() {
             <div className="hidden md:block absolute top-0 left-0 right-0 bg-bg1 min-h-[1080px] -z-50"></div>
 
             <Link href="/">
-                <div className="cursor-pointer w-[120px] h-[32px] relative">
+                <div className="cursor-pointer w-[208px] h-[47px] relative">
                     <Image src="/logo-w-text.png" alt="logo" fill sizes="any" />
                 </div>
             </Link>

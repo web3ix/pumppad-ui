@@ -41,7 +41,6 @@ export default function RootLayout({
     return (
         <html lang="en">
             <head>
-                <Script src="/static/datafeeds/udf/dist/polyfills.js"></Script>
                 <Script src="/static/datafeeds/udf/dist/bundle.js"></Script>
                 <link rel="preconnect" href="https://fonts.googleapis.com" />
                 <link

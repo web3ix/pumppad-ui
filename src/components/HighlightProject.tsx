@@ -40,7 +40,7 @@ export default function HighlightProject({ token }: { token?: IToken }) {
                                 <div className="overflow-hidden border border-[#334155] rounded-[5px] py-2 px-3">
                                     <div className="w-[24px] h-[24px] relative">
                                         <Image
-                                            src="/icons/website.svg"
+                                            src="/icons/web.svg"
                                             alt="website"
                                             fill
                                             sizes="any"
@@ -97,7 +97,7 @@ export default function HighlightProject({ token }: { token?: IToken }) {
                                 <div className="overflow-hidden border border-[#334155] rounded-[5px] py-2 px-3">
                                     <div className="w-[24px] h-[24px] relative">
                                         <Image
-                                            src="/icons/website.svg"
+                                            src="/icons/web.svg"
                                             alt="website"
                                             fill
                                             sizes="any"
@@ -111,7 +111,7 @@ export default function HighlightProject({ token }: { token?: IToken }) {
                                 <div className="overflow-hidden border border-[#334155] rounded-[5px] py-2 px-3">
                                     <div className="w-[24px] h-[24px] relative">
                                         <Image
-                                            src="/icons/website.svg"
+                                            src="/icons/web.svg"
                                             alt="website"
                                             fill
                                             sizes="any"
