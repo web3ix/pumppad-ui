@@ -91,8 +91,8 @@ export default function ProjectItem({ token }: { token: IToken }) {
                                         <div className="overflow-hidden border border-[#334155] rounded-[5px] py-2 px-3">
                                             <div className="w-[24px] h-[24px] relative">
                                                 <Image
-                                                    src="/icons/medium.svg"
-                                                    alt="medium"
+                                                    src="/icons/discord.svg"
+                                                    alt="discord"
                                                     fill
                                                     sizes="any"
                                                 />

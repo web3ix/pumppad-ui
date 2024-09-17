@@ -223,8 +223,7 @@ export default function TokenDetailPage({
             }
         } catch (error: any) {
             setSubmitting(false);
-            !error?.message?.includes("user rejected") &&
-                toast.error(error?.message ?? error);
+            toast.error(error?.message ?? error);
         }
     }, [
         connection,

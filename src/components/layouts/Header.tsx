@@ -13,7 +13,7 @@ export default function Header() {
         <div className="px-5 md:px-[120px] py-6 flex justify-between items-center relative">
             <Toaster />
             <div className="md:hidden absolute top-0 left-0 right-0 bg-mobile-bg1 min-h-[390px] -z-50"></div>
-            <div className="hidden md:block absolute top-0 left-0 right-0 bg-bg1 min-h-[1080px] -z-50"></div>
+            <div className="hidden md:block absolute top-0 left-0 right-0 bg-bg1 min-h-[1080px] -z-50 bg-no-repeat bg-cover bg-center"></div>
 
             <Link href="/">
                 <div className="cursor-pointer w-[177px] h-[40px] md:w-[208px] md:h-[47px] relative">

@@ -153,7 +153,7 @@ export default function SupportNetwork() {
                 <span className="flex items-center gap-6">
                     <div className="w-[64px] h-[64px] relative">
                         <Image
-                            src="/icons/networks/solana2.svg"
+                            src="/icons/networks/solana.svg"
                             alt="solana"
                             fill
                             sizes="any"

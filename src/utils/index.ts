@@ -23,7 +23,7 @@ export const calcPriceChange = (price: string | number) =>
     ).toFixed(2);
 
 export const calcMarketCap = (price: string | number): number =>
-    +parseFloat((+price * TOTAL_SUPPLY).toString()).toFixed(2);
+    +parseFloat((+price * TOTAL_SUPPLY * SOL_PRICE).toString()).toFixed(2);
 
 export const calcProgress = (reserve: string | number, round = 2) =>
     +parseFloat(((+reserve * 100) / TARGET_RESERVE).toString()).toFixed(round);

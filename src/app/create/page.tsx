@@ -1,7 +1,7 @@
 "use client";
 
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
-import { useCallback, useState, useRef } from "react";
+import { useCallback, useState, useRef, useEffect } from "react";
 import CurveSdk from "@/sdk/Curve";
 import Image from "next/image";
 import Link from "next/link";
@@ -70,14 +70,28 @@ export default function CreateToken() {
     // const handleChangeForm = changeForm(setForm);
     // const [isShowMore, setIsShowMore] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+    const [isSolBuy, setIsSolBuy] = useState<boolean>(true);
+    const [solBalance, setSolBalance] = useState<string | number>();
+    const [refresh, setRefresh] = useState<boolean>(false);
+
+    useEffect(() => {
+        (async () => {
+            if (!connection || !publicKey) return;
+
+            try {
+                // get sol balance
+                const balance = await connection.getBalance(publicKey);
+                setSolBalance(balance);
+            } catch (error) {}
+        })();
+    }, [connection, publicKey, refresh]);
 
     const handleCreate = useCallback(async () => {
         if (!connection || submitting) return;
         if (!publicKey) return toast.error("Connect wallet first");
 
-        console.log(name, symbol, description, icon);
-        if (!name) return toast.error("Name is required");
         if (!symbol) return toast.error("Symbol is required");
+        if (!name) return toast.error("Name is required");
         if (!description) return toast.error("Description is required");
         if (!icon) return toast.error("Icon is required");
         if (!banner) return toast.error("Banner is required");
@@ -114,13 +128,28 @@ export default function CreateToken() {
                     },
                 }
             );
-            let payload = [];
 
             let createTx;
 
             if (+initBuy > 0) {
-                const parsedAmount = new BN(ethers.parseUnits(initBuy, 9));
-                payload.push(parsedAmount);
+                let parsedAmount = new BN(ethers.parseUnits(initBuy, 9));
+
+                if (isSolBuy) {
+                    parsedAmount = await sdk.fetchAmountBuyFromReserve(
+                        symbol,
+                        parsedAmount,
+                        true
+                    );
+                }
+
+                const { reserve: reserveToBuy } = await sdk.fetchReserveToBuy(
+                    symbol,
+                    parsedAmount,
+                    true
+                );
+
+                if (reserveToBuy.gt(new BN(solBalance)))
+                    return toast.error("Insufficient Balance");
 
                 createTx = await sdk.createToken(
                     publicKey,
@@ -155,8 +184,7 @@ export default function CreateToken() {
             });
         } catch (error: any) {
             setSubmitting(false);
-            !error?.message?.includes("user rejected") &&
-                toast.error(error?.message ?? error);
+            toast.error(error?.message ?? error);
         }
     }, [
         connection,
@@ -167,6 +195,10 @@ export default function CreateToken() {
         icon,
         banner,
         Object.values(link),
+        Object.keys(tokenomics),
+        Object.values(tokenomics),
+        isSolBuy,
+        initBuy,
     ]);
 
     const handleInputLink = useCallback(
@@ -670,13 +702,19 @@ export default function CreateToken() {
                                 <div className="absolute left-[20px] top-1/2 -translate-y-1/2 flex gap-3 items-center">
                                     <div className="w-[24px] h-[24px] relative">
                                         <Image
-                                            src="/icons/solana.svg"
-                                            alt="solana"
+                                            src={
+                                                isSolBuy
+                                                    ? "/icons/solana.svg"
+                                                    : previewIcon
+                                            }
+                                            alt=""
                                             fill
                                             sizes="any"
                                         />
                                     </div>
-                                    <div className="font-bold">Sol</div>
+                                    <div className="font-bold">
+                                        {isSolBuy ? "Sol" : symbol}
+                                    </div>
                                 </div>
                                 <input
                                     id="initBuy"
@@ -688,7 +726,10 @@ export default function CreateToken() {
                                     }
                                 />
 
-                                <div className="cursor-pointer absolute right-[20px] top-1/2 -translate-y-1/2">
+                                <div
+                                    onClick={() => setIsSolBuy((pre) => !pre)}
+                                    className="cursor-pointer absolute right-[20px] top-1/2 -translate-y-1/2"
+                                >
                                     <div className="w-[24px] h-[24px] relative">
                                         <Image
                                             src="/icons/swap.svg"
