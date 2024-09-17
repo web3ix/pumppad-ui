@@ -352,7 +352,7 @@ export default function TokenDetailPage({
                                                         src={
                                                             isSolBuy
                                                                 ? "/icons/solana.svg"
-                                                                : data?.icon
+                                                                : data?.icon!
                                                         }
                                                         alt="solana"
                                                         fill
