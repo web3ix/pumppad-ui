@@ -8,23 +8,23 @@ import ProviderWrapper from "@/components/layouts/ProviderWrapper";
 export const metadata: Metadata = {
     title: "PumpPad",
     description:
-        "From Building to Launching in just a few steps - Powered by DEVHUB AI",
+        "Pump Pad is a multichain platform that streamlines token launching with comprehensive support and advanced security for seamless project deployment.",
     icons: {
-        icon: "/logo.png",
+        icon: "https://pumppad.vip/logo.png",
     },
     openGraph: {
         title: "PumpPad",
         description:
-            "From Building to Launching in just a few steps - Powered by DEVHUB AI",
+            "Pump Pad is a multichain platform that streamlines token launching with comprehensive support and advanced security for seamless project deployment.",
         type: "website",
         locale: "en_US",
         images: [
-            // {
-            //     url: image ? image.url : '/og-image.jpg',
-            //     width: image.width ? image.width : 1200,
-            //     height: image.height ? image.height : 630,
-            //     alt: title,
-            // }
+            {
+                url: "https://pumppad.vip/og.png",
+                width: 1200,
+                height: 630,
+                alt: "Pump Pad is a multichain platform that streamlines token launching with comprehensive support and advanced security for seamless project deployment.",
+            },
         ],
         siteName: "PumpPad",
     },
