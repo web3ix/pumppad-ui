@@ -119,7 +119,6 @@ export default function ProjectItem({
             if (Object.keys(link))
                 formData.append("link", JSON.stringify(link));
 
-            console.log(formData.has("description"));
             await axios.post(
                 `${process.env.NEXT_PUBLIC_API}/bond/tokens/${token.token}`,
                 formData,
