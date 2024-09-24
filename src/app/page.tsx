@@ -19,7 +19,13 @@ import Link from "next/link";
 import { useEffect, useMemo, useRef, useState } from "react";
 import useSWR from "swr";
 import Modal from "react-modal";
-import Drawer from "react-modern-drawer";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
 
 //import styles 👇
 import "react-modern-drawer/dist/index.css";
@@ -30,15 +36,12 @@ import clsx from "clsx";
 export default function HomePage() {
     const { publicKey } = useWallet();
     const { connect } = useConnect();
-    const ageRef = useRef<HTMLSelectElement>(null);
-    const minProgressRef = useRef<HTMLSelectElement>(null);
-    const maxProgressRef = useRef<HTMLSelectElement>(null);
     const [sortBy, setSortBy] = useState<EGetTokenSortBy>(
         EGetTokenSortBy.TRENDING
     );
     const [age, setAge] = useState<EGetTokenAge>(EGetTokenAge.ALL);
-    const [minProgress, setMinProgress] = useState<number>();
-    const [maxProgress, setMaxProgress] = useState<number>();
+    const [minProgress, setMinProgress] = useState<string>("0");
+    const [maxProgress, setMaxProgress] = useState<string>("100");
     const [search, setSearch] = useState<string>("");
 
     const { data: kingOfHill } = useSWR<IToken>(
@@ -48,7 +51,7 @@ export default function HomePage() {
 
     const { data, mutate, size, setSize, isLoading } = useSWRInfinite(
         (index) =>
-            `${process.env.NEXT_PUBLIC_API}/bond/tokens?sortBy=${sortBy}&search=${search}&take=${DEFAULT_LIMIT}&skip=${index * DEFAULT_LIMIT}`,
+            `${process.env.NEXT_PUBLIC_API}/bond/tokens?sortBy=${sortBy}&search=${search}&age=${age}&minProgress=${minProgress}&maxProgress=${maxProgress}&take=${DEFAULT_LIMIT}&skip=${index * DEFAULT_LIMIT}`,
         fetcher
     );
 
@@ -517,50 +520,58 @@ export default function HomePage() {
                     </div>
                 </div>
                 <div className="w-full max-w-full h-full flex gap-2 items-center mt-2 overflow-x-scroll">
-                    <button
-                        onClick={() => {
-                            ageRef.current?.focus();
-                        }}
-                        className="flex items-center justify-center gap-[11px] min-w-[200px] px-4 2xl:min-w-[250px] py-4 rounded-md bg-[#000000] box-shadow-stats border-gradient"
+                    <Select
+                        onValueChange={(value) => setAge(value as EGetTokenAge)}
                     >
-                        <h1 className="text-[18px]">Age</h1>
-                        <div className="w-[20px] h-[20px] relative">
-                            <Image
-                                src="/icons/arrow-down.svg"
-                                alt="arrow-down"
-                                fill
-                                sizes="any"
-                            />
-                        </div>
-                    </button>
-                    {/* <select ref={ageRef}>
-                        <option value="1h">1H</option>
-                        <option value="6h">6H</option>
-                        <option value="1d">1D</option>
-                        <option value="all">All</option>
-                    </select> */}
-                    <button className="flex items-center justify-center gap-[11px] min-w-[200px] px-4 2xl:min-w-[250px] py-4 rounded-md bg-[#000000] box-shadow-stats border-gradient">
-                        <h1 className="text-[18px]">Min progress</h1>
-                        <div className="w-[20px] h-[20px] relative">
-                            <Image
-                                src="/icons/arrow-down.svg"
-                                alt="arrow-down"
-                                fill
-                                sizes="any"
-                            />
-                        </div>
-                    </button>
-                    <button className="flex items-center justify-center gap-[11px] min-w-[200px] px-4 2xl:min-w-[250px] py-4 rounded-md bg-[#000000] box-shadow-stats border-gradient">
-                        <h1 className="text-[18px]">Max progress</h1>
-                        <div className="w-[20px] h-[20px] relative">
-                            <Image
-                                src="/icons/arrow-down.svg"
-                                alt="arrow-down"
-                                fill
-                                sizes="any"
-                            />
-                        </div>
-                    </button>
+                        <SelectTrigger className="font-vortex text-[18px] w-[200px] px-4 2xl:w-[250px] py-[26px] text-center flex justify-center gap-[11px] rounded-md bg-[#000000] box-shadow-stats border-gradient">
+                            <SelectValue placeholder="Age" />
+                        </SelectTrigger>
+                        <SelectContent className="font-vortex text-[18px] text-center flex justify-center">
+                            <SelectItem
+                                value={EGetTokenAge.LESS_THAN_1H}
+                                className="text-center"
+                            >
+                                &lt; 1 Hour
+                            </SelectItem>
+                            <SelectItem value={EGetTokenAge.LESS_THAN_6h}>
+                                &lt; 6 Hour
+                            </SelectItem>
+                            <SelectItem value={EGetTokenAge.LESS_THAN_1D}>
+                                &lt; 1 Day
+                            </SelectItem>
+                            <SelectItem value={EGetTokenAge.LESS_THAN_1W}>
+                                &lt; 1 Week
+                            </SelectItem>
+                            <SelectItem value={EGetTokenAge.ALL}>
+                                ALl
+                            </SelectItem>
+                        </SelectContent>
+                    </Select>
+                    <Select onValueChange={(value) => setMinProgress(value)}>
+                        <SelectTrigger className="font-vortex text-[18px] w-[200px] px-4 2xl:w-[250px] py-[26px] text-center flex justify-center gap-[11px] rounded-md bg-[#000000] box-shadow-stats border-gradient">
+                            <SelectValue placeholder="Min progress" />
+                        </SelectTrigger>
+                        <SelectContent className="font-vortex text-[18px]">
+                            <SelectItem value="0">0%</SelectItem>
+                            <SelectItem value="10">10%</SelectItem>
+                            <SelectItem value="20">20%</SelectItem>
+                            <SelectItem value="50">50%</SelectItem>
+                            <SelectItem value="100">100%</SelectItem>
+                        </SelectContent>
+                    </Select>
+
+                    <Select onValueChange={(value) => setMaxProgress(value)}>
+                        <SelectTrigger className="font-vortex text-[18px] w-[200px] px-4 2xl:w-[250px] py-[26px] text-center flex justify-center gap-[11px] rounded-md bg-[#000000] box-shadow-stats border-gradient">
+                            <SelectValue placeholder="Max progress" />
+                        </SelectTrigger>
+                        <SelectContent className="font-vortex text-[18px]">
+                            <SelectItem value="5">5%</SelectItem>
+                            <SelectItem value="10">10%</SelectItem>
+                            <SelectItem value="20">20%</SelectItem>
+                            <SelectItem value="50">50%</SelectItem>
+                            <SelectItem value="100">100%</SelectItem>
+                        </SelectContent>
+                    </Select>
                 </div>
             </div>
             {/* TODO */}
