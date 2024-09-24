@@ -18,14 +18,10 @@ export default function PortfolioTokenPage() {
         fetcher
     );
 
-    const isLoadMore = useMemo(() => {
-        console.log(size * DEFAULT_LIMIT, data?.[data.length - 1]?.total);
-        return (
-            !data ||
-            !data[data.length - 1]?.total ||
-            size * DEFAULT_LIMIT < data[data.length - 1].total
-        );
-    }, [size, data]);
+    const isLoadMore = useMemo(
+        () => size * DEFAULT_LIMIT < data?.[data.length - 1]?.total,
+        [size, data]
+    );
 
     const onLoadMore = () => {
         setSize((prev) => prev + 1);

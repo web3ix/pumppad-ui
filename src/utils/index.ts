@@ -150,7 +150,7 @@ export function numberFormatter(num: number | string, digits: number) {
         : "0";
 }
 
-export const DEFAULT_LIMIT = 2;
+export const DEFAULT_LIMIT = 10;
 
 export enum EGetTokenSortBy {
     TRENDING = "trending",
