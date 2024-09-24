@@ -54,7 +54,7 @@ export default function PortfolioTokenPage() {
                                 <ProjectItem
                                     key={idx}
                                     token={token}
-                                    showSetting={true}
+                                    showTracking={true}
                                 />
                             ))}
                         </div>
