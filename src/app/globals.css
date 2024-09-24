@@ -87,8 +87,8 @@ textarea {
 
 .border-gradient {
     /* border: 1px solid #a9ace7; */
-    border: 1px solid #8a8edc66;
-    border-bottom: 1px solid #8a8edc66;
+    border: 1.5px solid #8a8edc66;
+    border-bottom: 1.5px solid #8a8edc66;
 }
 
 .box-shadow-stats {

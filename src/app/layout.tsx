@@ -72,7 +72,7 @@ export default function RootLayout({
                 <link rel="manifest" href="/site.webmanifest"></link>
             </head>
             <ProviderWrapper>
-                <body className="flex flex-col items-stretch justify-between min-h-dvh">
+                <body className="min-h-dvh">
                     <Header />
                     <div>{children}</div>
                     <Footer />

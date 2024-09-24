@@ -28,6 +28,12 @@ export default function Header() {
                 <Link href="/create">
                     <h1>Launch</h1>
                 </Link>
+                <Link href="/my-token">
+                    <h1>My Token</h1>
+                </Link>
+                <Link href="/portfolio">
+                    <h1>Portfolio</h1>
+                </Link>
                 <Link href="https://t.me/pumppad" target="_blank">
                     <h1>Telegram</h1>
                 </Link>
@@ -65,7 +71,7 @@ export default function Header() {
                             Connect
                         </button>
                     ) : (
-                        <Link href="/profile">
+                        <Link href="/my-token">
                             <button className="hidden md:block py-2 px-3 rounded-md text-sm justify-center items-center font-semibold md:bg-[#0038FF]">
                                 {`${publicKey.toString().slice(0, 4)}...${publicKey.toString().slice(-3)}`}
                             </button>

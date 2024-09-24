@@ -14,6 +14,13 @@ export interface ITrade {
     token?: IToken;
 }
 
+export interface IComment {
+    id: string;
+    address: string;
+    text: string;
+    timestamp: number;
+}
+
 export interface IToken {
     id: string;
     token: string;
@@ -32,7 +39,9 @@ export interface IToken {
     link?: any;
     lastPrice: number;
     timestamp: number;
+    volume: number;
     trades: ITrade[];
+    comments: IComment[];
 }
 
 export interface ITokenMetadata {

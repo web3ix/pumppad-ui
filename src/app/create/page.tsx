@@ -9,19 +9,16 @@ import useConnect from "@/hooks/useConnect";
 import axios from "axios";
 import clsx from "clsx";
 import { sliceString } from "@/utils";
-import useReadonlyRpc from "@/hooks/useReadonlyRpc";
 import copy from "copy-to-clipboard";
 import { TwitterShareButton } from "react-share";
 import { ethers } from "ethers";
 import { BN } from "@coral-xyz/anchor";
 import { toast } from "react-hot-toast";
 
-export default function CreateToken() {
+export default function CreateTokenPage() {
     const { publicKey, sendTransaction } = useWallet();
     const { connection } = useConnection();
     const { connect } = useConnect();
-
-    const readonlyRpc = useReadonlyRpc();
 
     const iconRef = useRef<HTMLInputElement>(null);
     const bannerRef = useRef<HTMLInputElement>(null);
@@ -171,7 +168,7 @@ export default function CreateToken() {
                 maxRetries: 10,
             });
 
-            await readonlyRpc.confirmTransaction(signature, "confirmed");
+            await connection.confirmTransaction(signature, "confirmed");
 
             setSubmitting(false);
 
@@ -486,7 +483,7 @@ export default function CreateToken() {
 
                             <div className="flex-1">
                                 <label htmlFor="banner" className="font-bold">
-                                    Banner
+                                    Banner*
                                 </label>
                                 <input
                                     type="file"
@@ -802,7 +799,7 @@ export default function CreateToken() {
                         </p>
                     </div>
 
-                    <Link href={`/token/${token.bond}`}>
+                    <Link href={`/my-token`}>
                         <button className="btn-primary font-vortex text-[18px] py-4 min-w-[400px]">
                             Go to my token page
                         </button>

@@ -129,3 +129,41 @@ export function numberWithCommas(x: number | string | undefined) {
               +formatSmartNumber(parseFloat(x.toString()).toFixed(7)).toString()
           );
 }
+
+export function numberFormatter(num: number | string, digits: number) {
+    const lookup = [
+        { value: 1, symbol: "" },
+        { value: 1e3, symbol: "k" },
+        { value: 1e6, symbol: "M" },
+        { value: 1e9, symbol: "G" },
+        { value: 1e12, symbol: "T" },
+        { value: 1e15, symbol: "P" },
+        { value: 1e18, symbol: "E" },
+    ];
+    const regexp = /\.0+$|(?<=\.[0-9]*[1-9])0+$/;
+    const item = lookup.findLast((item) => +num >= item.value);
+    return item
+        ? (+num / item.value)
+              .toFixed(digits)
+              .replace(regexp, "")
+              .concat(item.symbol)
+        : "0";
+}
+
+export const DEFAULT_LIMIT = 2;
+
+export enum EGetTokenSortBy {
+    TRENDING = "trending",
+    TOP = "top",
+    RAISING = "raising",
+    NEW = "new",
+    FINISHED = "finished",
+}
+
+export enum EGetTokenAge {
+    LESS_THAN_1H = "less_than_1h",
+    LESS_THAN_6h = "less_than_6",
+    LESS_THAN_1D = "less_than_1D",
+    LESS_THAN_1W = "less_than_1W",
+    ALL = "all",
+}

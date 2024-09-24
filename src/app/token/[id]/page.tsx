@@ -3,11 +3,11 @@
 import Image from "next/image";
 import HighlightProject from "@/components/HighlightProject";
 import BondChart from "@/components/chart/BondChart";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useConnection, useWallet } from "@solana/wallet-adapter-react";
 import CurveSdk from "@/sdk/Curve";
 import { BN } from "@coral-xyz/anchor";
-import { IToken, useAppStore } from "@/store";
+import { IComment, IToken, useAppStore } from "@/store";
 import useSWR from "swr";
 import {
     TOTAL_SALE,
@@ -17,8 +17,10 @@ import {
     calcProgress,
     fetcher,
     getSignatureUrl,
+    numberFormatter,
     numberWithCommas,
     sliceString,
+    timeDiff,
 } from "@/utils";
 import { PublicKey, LAMPORTS_PER_SOL } from "@solana/web3.js";
 import useConnect from "@/hooks/useConnect";
@@ -29,6 +31,9 @@ import dayjs from "dayjs";
 import { ethers } from "ethers";
 import { checkOrCreateAssociatedTokenAccount } from "@/sdk/utils";
 import { toast } from "react-hot-toast";
+import { getAccount } from "@solana/spl-token";
+import base58 from "bs58";
+import axios from "axios";
 
 const relativeTime = require("dayjs/plugin/relativeTime");
 dayjs.extend(relativeTime);
@@ -52,7 +57,7 @@ export default function TokenDetailPage({
         `${process.env.NEXT_PUBLIC_API}/bond/tokens/${params.id}`,
         fetcher
     );
-    const { publicKey, sendTransaction } = useWallet();
+    const { publicKey, sendTransaction, signMessage } = useWallet();
     const { connection } = useConnection();
     const { connect } = useConnect();
 
@@ -68,15 +73,33 @@ export default function TokenDetailPage({
     const [refresh, setRefresh] = useState<boolean>(false);
     const [submitting, setSubmitting] = useState(false);
 
+    const [chatInput, setChatInput] = useState("");
+
     useEffect(() => {
         (async () => {
-            if (!connection || !data?.token) return;
+            if (!data?.token) return;
 
             try {
                 const res = await connection.getTokenLargestAccounts(
                     new PublicKey(data.token)
                 );
-                setHolders(res.value as [Holder]);
+
+                let holders = res.value as [Holder];
+
+                const holderAccount = await Promise.all(
+                    holders.map((holder) =>
+                        getAccount(connection, holder.address).then(
+                            (r) => r.owner
+                        )
+                    )
+                );
+
+                let _holders = holders.reduce<Holder[]>((acc, holder, idx) => {
+                    acc.push({ ...holder, address: holderAccount[idx] });
+                    return acc;
+                }, []);
+
+                setHolders(_holders);
             } catch (error) {}
         })();
     }, [connection, data?.token]);
@@ -109,18 +132,33 @@ export default function TokenDetailPage({
         if (!socket || !data || !mutate) return;
 
         socket.on("new-trade", (payload) => {
-            console.log("🚀 New trade:", payload);
-            const exist = data.trades.find((trade) => trade.id === payload.id);
+            if (payload.token != params.id) return;
 
+            const exist = data.trades.find((trade) => trade.id === payload.id);
             if (!exist) {
                 mutate({
                     ...data,
                     lastPrice: payload.lastPrice,
-                    trades: [...data.trades, payload],
+                    trades: [payload, ...data.trades],
                 });
             }
         });
-    }, [socket, data, mutate]);
+
+        socket.on("new-comment", (payload) => {
+            if (payload.token != params.id) return;
+
+            const exist = data.comments.find(
+                (comment) => comment.id === payload.id
+            );
+
+            if (!exist) {
+                mutate({
+                    ...data,
+                    comments: [payload, ...data.trades],
+                });
+            }
+        });
+    }, [socket, data, mutate, params.id]);
 
     const handleTrade = useCallback(async () => {
         if (!data?.symbol || submitting) return;
@@ -222,8 +260,9 @@ export default function TokenDetailPage({
                 toast.success("Sell successful!");
             }
         } catch (error: any) {
-            setSubmitting(false);
             toast.error(error?.message ?? error);
+        } finally {
+            setSubmitting(false);
         }
     }, [
         connection,
@@ -237,6 +276,44 @@ export default function TokenDetailPage({
         submitting,
     ]);
 
+    const handleComment = useCallback(async () => {
+        if (!publicKey || !chatInput || !data) return;
+
+        try {
+            const encodedMessage = new TextEncoder().encode(
+                `${chatInput}${params.id}`
+            );
+            const signedMessage = await signMessage?.(encodedMessage);
+            const signature = base58.encode(signedMessage as Uint8Array);
+
+            const res = await axios.post<IComment>(
+                `${process.env.NEXT_PUBLIC_API}/bond/tokens/${params.id}/comments`,
+                {
+                    user: publicKey.toString(),
+                    content: chatInput,
+                    signature,
+                }
+            );
+
+            let _comments = data.comments;
+            _comments.unshift(res.data);
+
+            mutate({
+                ...data,
+                comments: _comments,
+            });
+            setChatInput("");
+            toast.success("Comment success");
+        } catch (error: any) {
+            toast.error(error.message ?? error);
+        }
+    }, [signMessage, publicKey, chatInput, params.id, data]);
+
+    const comments = useMemo<IComment[]>(() => {
+        if (!data?.comments) return [];
+        return data.comments.slice(0, 2).reverse();
+    }, [data?.comments]);
+
     return (
         <>
             <TopTokenBar />
@@ -244,7 +321,7 @@ export default function TokenDetailPage({
             <div className="px-5 md:px-[120px] my-10 flex flex-col gap-10 items-stretch">
                 <div className="mt-10">
                     {data?.banner && (
-                        <div className="border border-[#4338CA] rounded-t-[10px] overflow-hidden w-full pt-[27%] relative">
+                        <div className="hidden md:block border-[2px] border-[#fff] rounded-t-[10px] overflow-hidden w-full pt-[27%] relative">
                             <Image
                                 src={data.banner}
                                 alt="banner"
@@ -635,10 +712,11 @@ export default function TokenDetailPage({
                                     )}
                                 </div>
                                 <div className="col-span-2">
-                                    {numberWithCommas(
+                                    {numberFormatter(
                                         +parseFloat(
                                             trade.parseAmount.toString()
-                                        ).toFixed(4)
+                                        ).toFixed(4),
+                                        3
                                     )}
                                 </div>
 
@@ -698,29 +776,54 @@ export default function TokenDetailPage({
                         <h1 className="primary-text-gradient text-[30px]">
                             Pump Chat
                         </h1>
-                        {/* <div className="border-gradient p-[17px] rounded-[10px]">
-                        <div className="flex items-center gap-4 mb-6">
-                            <div>5vSS...ESjDmXj</div>
-                            <div>4:30 p.m</div>
+                        {comments.map((comment, idx) => (
+                            <>
+                                <div className="border-gradient p-[17px] rounded-[10px]">
+                                    <div className="flex items-center gap-4 mb-6">
+                                        <div>
+                                            {sliceString(comment.address, 4, 6)}
+                                        </div>
+                                        <div className="line-clamp-3">
+                                            {dayjs(
+                                                comment.timestamp * 1000
+                                                // @ts-ignore
+                                            ).fromNow()}
+                                        </div>
+                                    </div>
+                                    <p>{comment.text}</p>
+                                </div>
+                                {idx !== comments.length - 1 && (
+                                    <div className="h-[1px] bg-[#FFF]"></div>
+                                )}
+                            </>
+                        ))}
+
+                        <div className="relative">
+                            <input
+                                className="border-gradient pr-[100px]"
+                                placeholder="Submit your chat here"
+                                value={chatInput}
+                                onChange={(e) => setChatInput(e.target.value)}
+                            />
+
+                            <div
+                                onClick={handleComment}
+                                className="cursor-pointer absolute right-[8px] top-1/2 -translate-y-1/2 flex items-center rounded-md gap-1 bg-[#111827] py-2 px-3"
+                            >
+                                <h1>Send</h1>
+                                <div className="w-[16px] h-[16px] relative">
+                                    <Image
+                                        src="/icons/circle.svg"
+                                        alt="circle"
+                                        fill
+                                        sizes="any"
+                                    />
+                                </div>
+                                {/* <div>Contact</div> */}
+                                {/* <div> TODO
+                        </div> */}
+                            </div>
                         </div>
-                        <p>Zone 1 entry confirmed , let's go break ATH</p>
-                    </div>
-                    <div className="h-[1px] bg-[#FFF]"></div>
-                    <div className="border-gradient p-[17px] rounded-[10px]">
-                        <div className="flex items-center gap-4 mb-6">
-                            <div>5vSS...ESjDmXj</div>
-                            <div>4:30 p.m</div>
-                        </div>
-                        <p>Zone 1 entry confirmed , let's go break ATH</p>
-                    </div>
-                    <div className="h-[1px] bg-[#FFF]"></div>{" "}
-                    <div className="border-gradient p-[17px] rounded-[10px]">
-                        <div className="flex items-center gap-4 mb-6">
-                            <div>5vSS...ESjDmXj</div>
-                            <div>4:30 p.m</div>
-                        </div>
-                        <p>Zone 1 entry confirmed , let's go break ATH</p>
-                    </div> */}
                     </div>
                 </div>
             </div>
