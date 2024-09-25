@@ -20,6 +20,7 @@ import { AUTHORITY, PROGRAM_ID } from "./constants";
 import { CurveEventHandlers, CurveEventType } from "./types";
 import { checkOrCreateAssociatedTokenAccount } from "./utils";
 import {
+    createCloseAccountInstruction,
     createSyncNativeInstruction,
     getAssociatedTokenAddress,
 } from "@solana/spl-token";
@@ -885,7 +886,9 @@ export default class CurveSdk {
             ),
         ]);
 
-        return this.program.methods
+        const tx = new Transaction();
+
+        const sellTx = await this.program.methods
             .sellToken(symbol, amount, minReserveAmount)
             .accounts({
                 sellerTokenAccount: sellerAta,
@@ -909,6 +912,21 @@ export default class CurveSdk {
                 systemProgram: web3.SystemProgram.programId,
             })
             .transaction();
+
+        tx.add(sellTx);
+
+        // check and wrap sol to wsol
+        if (this.configAccountData.reserveToken.equals(WSOL)) {
+            tx.add(
+                createCloseAccountInstruction(
+                    sellerReserveTokenAta,
+                    seller,
+                    seller
+                )
+            );
+        }
+
+        return tx;
     }
 
     async addLp(symbol: string): Promise<Transaction> {
