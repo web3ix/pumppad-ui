@@ -83,12 +83,12 @@ export default function ProjectItem({
         if (!publicKey) return toast.error("Connect wallet first");
         try {
             setSubmitting(true);
-            const encodedMessage = new TextEncoder().encode(token.token);
-            const signedMessage = await signMessage?.(encodedMessage);
-            const signature = base58.encode(signedMessage as Uint8Array);
+            // const encodedMessage = new TextEncoder().encode(token.token);
+            // const signedMessage = await signMessage?.(encodedMessage);
+            // const signature = base58.encode(signedMessage as Uint8Array);
 
             const formData = new FormData();
-            formData.append("signature", signature);
+            // formData.append("signature", signature);
             if (description) formData.append("description", description);
             if (icon) formData.append("icon", icon);
             if (banner) formData.append("banner", banner);
