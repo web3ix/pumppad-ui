@@ -266,7 +266,7 @@ export default function HomePage() {
                         {!publicKey && (
                             <button
                                 onClick={connect}
-                                className="flex items-center justify-center gap-[11px] py-4 min-w-[305px] btn-primary"
+                                className="flex items-center justify-center gap-[11px] py-4 min-w-[305px] btn-primary mb-2.5 md:mb-0"
                             >
                                 <span>Connect wallet</span>
                                 <div className="w-[18px] h-[18px] relative">
