@@ -164,6 +164,7 @@ export default function ProjectItem({
                                 // right: "auto",
                                 // bottom: "auto",
                                 // marginRight: "-50%",
+                                zIndex: 999,
                                 transform: "translateX(-50%)",
                                 width: "90%",
                                 maxWidth: "1066px",
@@ -529,10 +530,25 @@ export default function ProjectItem({
                             </div>
                         </div>
                     </Modal>
+                </>
+            )}
+
+            {showTracking && (
+                <Link href={`/token/${token.token}`}>
+                    <h1 className="z-[1] cursor-pointer absolute right-[16px] top-[16px] box-shadow-stats px-6 py-4 rounded-md btn-primary">
+                        Tracking
+                    </h1>
+                </Link>
+            )}
+
+            <div className="flex flex-col items-stretch">
+                <div className="border-[1.5px] border-[#fff] rounded-t-xl overflow-hidden w-full h-[180px] relative">
+                    <Image src={token.banner} alt="banner" fill sizes="any" />
+
                     <div
                         onClick={openModal}
                         className={clsx(
-                            "z-[999] cursor-pointer absolute right-[16px] top-[16px] box-shadow-stats flex items-center gap-[10px] px-4 py-2 rounded-md bg-[#000]",
+                            "cursor-pointer absolute right-[16px] top-[16px] box-shadow-stats flex items-center gap-[10px] px-4 py-2 rounded-md bg-[#000]",
                             {
                                 hidden: isOpenModal || !showSetting,
                             }
@@ -548,28 +564,9 @@ export default function ProjectItem({
                             />
                         </div>
                     </div>
-                </>
-            )}
+                </div>
 
-            {showTracking && (
                 <Link href={`/token/${token.token}`}>
-                    <h1 className="z-[999] cursor-pointer absolute right-[16px] top-[16px] box-shadow-stats px-6 py-4 rounded-md btn-primary">
-                        Tracking
-                    </h1>
-                </Link>
-            )}
-
-            <Link href={`/token/${token.token}`}>
-                <div className="flex flex-col items-stretch">
-                    <div className="border-[1.5px] border-[#fff] rounded-t-xl overflow-hidden w-full h-[180px] relative">
-                        <Image
-                            src={token.banner}
-                            alt="banner"
-                            fill
-                            sizes="any"
-                        />
-                    </div>
-
                     <div className="flex-1 -translate-y-10 flex flex-col items-stretch p-6 gap-8 border-[1.5px] border-[#fff] rounded-xl bg-[#000]">
                         <div className="flex justify-between">
                             <div className="flex gap-[13px]">
@@ -784,8 +781,8 @@ export default function ProjectItem({
                             </div>
                         </div>
                     </div>
-                </div>
-            </Link>
+                </Link>
+            </div>
         </div>
     );
 }
