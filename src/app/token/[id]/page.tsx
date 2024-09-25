@@ -75,6 +75,8 @@ export default function TokenDetailPage({
 
     const [chatInput, setChatInput] = useState("");
 
+    console.log("🚀 ~ file: page.tsx:79 ~ data:", data);
+
     useEffect(() => {
         (async () => {
             if (!data?.token) return;

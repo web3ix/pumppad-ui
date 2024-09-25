@@ -204,9 +204,9 @@ export default function HighlightProject({
                         </div>
                         <div className="flex justify-between md:text-[20px] 2xl:text-[40px] font-bold leading-[40px] overflow-hidden">
                             <div>
-                                {parseFloat(token.lastPrice.toString()).toFixed(
-                                    10
-                                )}
+                                {parseFloat(
+                                    token?.lastPrice?.toString()
+                                ).toFixed(10)}
                             </div>
                         </div>
                     </div>
@@ -254,7 +254,7 @@ export default function HighlightProject({
                             $
                             {token.volume > 0
                                 ? numberFormatter(
-                                      calcMarketCap(token.volume),
+                                      calcLiquidity(token.volume),
                                       2
                                   )
                                 : 0}

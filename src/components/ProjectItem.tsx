@@ -718,7 +718,7 @@ export default function ProjectItem({
                             </h1>
                         </div>
 
-                        <div className="px-[18px] pb-[41px]">
+                        <div className="pt-[18px] px-[18px] pb-[41px] bg-[#2d2d2d2e] rounded-[15px]">
                             <div className="font-vortex grid grid-cols-3 gap-[18px] mb-[29px]">
                                 <div className="flex flex-col gap-4">
                                     <div className="md:text-[15px] 2xl:text-[20px] text-[#666666]">
@@ -728,13 +728,13 @@ export default function ProjectItem({
                                         $
                                         {token.volume > 0
                                             ? numberFormatter(
-                                                  calcMarketCap(token.volume),
+                                                  calcLiquidity(token.volume),
                                                   2
                                               )
                                             : 0}
                                     </h1>
                                 </div>
-                                <div className="flex flex-col gap-4">
+                                <div className="flex flex-col gap-4 text-center">
                                     <div className="md:text-[15px] 2xl:text-[20px] text-[#666666]">
                                         Marketcap
                                     </div>
@@ -750,7 +750,7 @@ export default function ProjectItem({
                                             : 0}
                                     </h1>
                                 </div>
-                                <div className="flex flex-col gap-4">
+                                <div className="flex flex-col gap-4 text-right">
                                     <div className="md:text-[15px] 2xl:text-[20px] text-[#666666]">
                                         LP
                                     </div>
