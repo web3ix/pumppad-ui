@@ -191,6 +191,7 @@ export default function CreateTokenPage() {
         description,
         icon,
         banner,
+        previewIcon,
         Object.values(link),
         Object.keys(tokenomics),
         Object.values(tokenomics),
