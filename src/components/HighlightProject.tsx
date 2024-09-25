@@ -28,12 +28,12 @@ export default function HighlightProject({
     token?: IToken;
     showBtnPump?: boolean;
 }) {
-    if (!token) return <Skeleton h="490px" />;
-
     const links = useMemo(
-        () => (token.link ? JSON.parse(token.link) : undefined),
-        [token.link]
+        () => (token?.link ? JSON.parse(token.link) : undefined),
+        [token?.link]
     );
+
+    if (!token) return <Skeleton h="490px" />;
 
     return (
         <div className="w-full flex flex-col md:flex-row p-6 gap-7 border-gradient rounded-2xl bg-[#000]">
