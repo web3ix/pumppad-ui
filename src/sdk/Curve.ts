@@ -262,10 +262,7 @@ export default class CurveSdk {
         }
 
         let newSupply = amount.add(currentSupply);
-        console.log(
-            "🚀 ~ file: Curve.ts:263 ~ CurveSdk ~ amount:",
-            amount.toString()
-        );
+
         if (newSupply.gt(this.MAX_SUPPLY)) throw new Error("Exceed Max Supply");
 
         // tokensLeft > 0 -> can never happen
@@ -851,7 +848,7 @@ export default class CurveSdk {
 
         const [
             sellerAta,
-            sellerReserveTokenAta,
+            { ata: sellerReserveTokenAta, tx: createSellerReserveAtaTx },
             feeWalletReserveTokenAta,
             feeWalletReserveTokenAta2,
             feeWalletReserveTokenAta3,
@@ -860,11 +857,11 @@ export default class CurveSdk {
                 mint: mint,
                 owner: seller,
             }),
-            getAssociatedTokenAddress(
-                this.configAccountData.reserveToken,
+            checkOrCreateAssociatedTokenAccount(
+                this.connection,
                 seller,
-                false,
-                reserveTokenInfo.value.owner
+                seller,
+                this.configAccountData.reserveToken
             ),
             getAssociatedTokenAddress(
                 this.configAccountData.reserveToken,
@@ -887,6 +884,8 @@ export default class CurveSdk {
         ]);
 
         const tx = new Transaction();
+
+        if (createSellerReserveAtaTx) tx.add(createSellerReserveAtaTx);
 
         const sellTx = await this.program.methods
             .sellToken(symbol, amount, minReserveAmount)

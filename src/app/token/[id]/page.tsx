@@ -75,8 +75,6 @@ export default function TokenDetailPage({
 
     const [chatInput, setChatInput] = useState("");
 
-    console.log("🚀 ~ file: page.tsx:79 ~ data:", data);
-
     useEffect(() => {
         (async () => {
             if (!data?.token) return;
@@ -200,8 +198,8 @@ export default function TokenDetailPage({
                     return toast.error("Insufficient Balance");
 
                 const maxReserveAmount = reserveToBuy.add(
-                    reserveToBuy.div(new BN("20"))
-                ); // slippage 5% // TODO by user settings
+                    reserveToBuy.div(new BN("5"))
+                ); // slippage 20% // TODO by user settings
 
                 const buyTx = await sdk.buyToken(
                     publicKey,
@@ -243,8 +241,8 @@ export default function TokenDetailPage({
                 reserveForSell = _reserveForSell;
 
                 const minReserveAmount = reserveForSell.sub(
-                    reserveForSell.div(new BN("20"))
-                ); // slippage 5% TODO by user settings
+                    reserveForSell.div(new BN("5"))
+                ); // slippage 20% TODO by user settings
 
                 const sellTx = await sdk.sellToken(
                     publicKey,
