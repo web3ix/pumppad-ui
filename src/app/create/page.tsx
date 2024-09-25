@@ -14,6 +14,7 @@ import { TwitterShareButton } from "react-share";
 import { ethers } from "ethers";
 import { BN } from "@coral-xyz/anchor";
 import { toast } from "react-hot-toast";
+import { sleep } from "@/sdk/utils";
 
 export default function CreateTokenPage() {
     const { publicKey, sendTransaction } = useWallet();
@@ -169,6 +170,8 @@ export default function CreateTokenPage() {
             });
 
             await connection.confirmTransaction(signature, "confirmed");
+
+            await sleep(3000);
 
             setSubmitting(false);
 
@@ -800,7 +803,7 @@ export default function CreateTokenPage() {
                         </p>
                     </div>
 
-                    <Link href={`/my-token`}>
+                    <Link href={`/token/${token.bond}`}>
                         <button className="btn-primary font-vortex text-[18px] py-4 min-w-[400px]">
                             Go to my token page
                         </button>
@@ -839,7 +842,7 @@ export default function CreateTokenPage() {
                                 </div>
                             </div>
                         </Link>
-                        <Link href="/profile">
+                        <Link href="/my-token">
                             <div className="cursor-pointer flex items-center gap-2">
                                 <div className="font-medium">
                                     Manage my token
