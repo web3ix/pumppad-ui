@@ -12,7 +12,7 @@ import { useWallet, useConnection } from "@solana/wallet-adapter-react";
 import clsx from "clsx";
 import Image from "next/image";
 import Link from "next/link";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import Modal from "react-modal";
 import { toast } from "react-hot-toast";
 import axios from "axios";
@@ -73,33 +73,10 @@ export default function ProjectItem({
         [setLink]
     );
 
-    // const handleComment = useCallback(async () => {
-    //     if (!publicKey || !chatInput || !data) return;
-
-    //     try {
-
-    //         const res = await axios.post<IComment>(
-    //             `${process.env.NEXT_PUBLIC_API}/bond/tokens/${params.id}/comments`,
-    //             {
-    //                 user: publicKey.toString(),
-    //                 content: chatInput,
-    //                 signature,
-    //             }
-    //         );
-
-    //         let _comments = data.comments;
-    //         _comments.unshift(res.data);
-
-    //         mutate({
-    //             ...data,
-    //             comments: _comments,
-    //         });
-    //         setChatInput("");
-    //         toast.success("Comment success");
-    //     } catch (error: any) {
-    //         toast.error(error.message ?? error);
-    //     }
-    // }, [signMessage, publicKey, chatInput, params.id, data]);
+    const links = useMemo(
+        () => (token.link ? JSON.parse(token.link) : undefined),
+        [token.link]
+    );
 
     const handleUpdate = useCallback(async () => {
         if (!connection || submitting) return;
@@ -585,9 +562,9 @@ export default function ProjectItem({
                                     </h1>
 
                                     <div className="flex gap-[5px] items-center">
-                                        {token.link?.website && (
+                                        {links?.website && (
                                             <Link
-                                                href={token.link.website}
+                                                href={links.website}
                                                 target="_blank"
                                             >
                                                 <div className="overflow-hidden border border-[#334155] rounded-[5px] py-2 px-3">
@@ -602,9 +579,9 @@ export default function ProjectItem({
                                                 </div>
                                             </Link>
                                         )}
-                                        {token.link?.telegram && (
+                                        {links?.telegram && (
                                             <Link
-                                                href={token.link.telegram}
+                                                href={links.telegram}
                                                 target="_blank"
                                             >
                                                 <div className="overflow-hidden border border-[#334155] rounded-[5px] py-2 px-3">
@@ -619,9 +596,9 @@ export default function ProjectItem({
                                                 </div>
                                             </Link>
                                         )}
-                                        {token.link?.twitter && (
+                                        {links?.twitter && (
                                             <Link
-                                                href={token.link.twitter}
+                                                href={links.twitter}
                                                 target="_blank"
                                             >
                                                 <div className="overflow-hidden border border-[#334155] rounded-[5px] py-2 px-3">
@@ -636,9 +613,9 @@ export default function ProjectItem({
                                                 </div>
                                             </Link>
                                         )}
-                                        {token.link?.discord && (
+                                        {links?.discord && (
                                             <Link
-                                                href={token.link.discord}
+                                                href={links.discord}
                                                 target="_blank"
                                             >
                                                 <div className="overflow-hidden border border-[#334155] rounded-[5px] py-2 px-3">
@@ -654,9 +631,9 @@ export default function ProjectItem({
                                             </Link>
                                         )}
 
-                                        {token.link?.link1 && (
+                                        {links?.link1 && (
                                             <Link
-                                                href={token.link.link1}
+                                                href={links.link1}
                                                 target="_blank"
                                             >
                                                 <div className="overflow-hidden border border-[#334155] rounded-[5px] py-2 px-3">
@@ -671,9 +648,9 @@ export default function ProjectItem({
                                                 </div>
                                             </Link>
                                         )}
-                                        {token.link?.link2 && (
+                                        {links?.link2 && (
                                             <Link
-                                                href={token.link.link2}
+                                                href={links.link2}
                                                 target="_blank"
                                             >
                                                 <div className="overflow-hidden border border-[#334155] rounded-[5px] py-2 px-3">

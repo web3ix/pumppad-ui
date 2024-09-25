@@ -17,6 +17,7 @@ import utc from "dayjs/plugin/utc";
 import Skeleton from "./Skeleton";
 import copy from "copy-to-clipboard";
 import clsx from "clsx";
+import { useMemo } from "react";
 
 dayjs.extend(utc);
 
@@ -28,6 +29,11 @@ export default function HighlightProject({
     showBtnPump?: boolean;
 }) {
     if (!token) return <Skeleton h="490px" />;
+
+    const links = useMemo(
+        () => (token.link ? JSON.parse(token.link) : undefined),
+        [token.link]
+    );
 
     return (
         <div className="w-full flex flex-col md:flex-row p-6 gap-7 border-gradient rounded-2xl bg-[#000]">
@@ -41,12 +47,102 @@ export default function HighlightProject({
 
             <div className="flex-1 flex flex-col justify-between gap-6 relative">
                 <div className="absolute right-0 top-0 hidden md:block text-right px-[8px]">
-                    <h1 className="md:text-[15px] 2xl:text-[20px] text-[#19FB9B]">
-                        Created
-                    </h1>
-                    <h1 className="md:text-[20px] 2xl:text-[25px] pt-[16px]">
-                        {timeDiff(token.timestamp)}
-                    </h1>
+                    <div className="flex gap-2 items-center">
+                        {links?.website && (
+                            <Link href={links.website} target="_blank">
+                                <div className="overflow-hidden border border-[#334155] rounded-[5px] py-2 px-3">
+                                    <div className="w-[24px] h-[24px] relative">
+                                        <Image
+                                            src="/icons/web2.svg"
+                                            alt="website"
+                                            fill
+                                            sizes="any"
+                                        />
+                                    </div>
+                                </div>
+                            </Link>
+                        )}
+                        {links?.telegram && (
+                            <Link href={links.telegram} target="_blank">
+                                <div className="overflow-hidden border border-[#334155] rounded-[5px] py-2 px-3">
+                                    <div className="w-[24px] h-[24px] relative">
+                                        <Image
+                                            src="/icons/telegram.svg"
+                                            alt="telegram"
+                                            fill
+                                            sizes="any"
+                                        />
+                                    </div>
+                                </div>
+                            </Link>
+                        )}
+                        {links?.twitter && (
+                            <Link href={links.twitter} target="_blank">
+                                <div className="overflow-hidden border border-[#334155] rounded-[5px] py-2 px-3">
+                                    <div className="w-[24px] h-[24px] relative">
+                                        <Image
+                                            src="/icons/twitter.svg"
+                                            alt="twitter"
+                                            fill
+                                            sizes="any"
+                                        />
+                                    </div>
+                                </div>
+                            </Link>
+                        )}
+                        {links?.discord && (
+                            <Link href={links.discord} target="_blank">
+                                <div className="overflow-hidden border border-[#334155] rounded-[5px] py-2 px-3">
+                                    <div className="w-[24px] h-[24px] relative">
+                                        <Image
+                                            src="/icons/medium.svg"
+                                            alt="medium"
+                                            fill
+                                            sizes="any"
+                                        />
+                                    </div>
+                                </div>
+                            </Link>
+                        )}
+
+                        {links?.link1 && (
+                            <Link href={links.link1} target="_blank">
+                                <div className="overflow-hidden border border-[#334155] rounded-[5px] py-2 px-3">
+                                    <div className="w-[24px] h-[24px] relative">
+                                        <Image
+                                            src="/icons/web2.svg"
+                                            alt="website"
+                                            fill
+                                            sizes="any"
+                                        />
+                                    </div>
+                                </div>
+                            </Link>
+                        )}
+                        {links?.link2 && (
+                            <Link href={links.link2} target="_blank">
+                                <div className="overflow-hidden border border-[#334155] rounded-[5px] py-2 px-3">
+                                    <div className="w-[24px] h-[24px] relative">
+                                        <Image
+                                            src="/icons/web2.svg"
+                                            alt="website"
+                                            fill
+                                            sizes="any"
+                                        />
+                                    </div>
+                                </div>
+                            </Link>
+                        )}
+                    </div>
+
+                    <div className="mt-[27px]">
+                        <h1 className="md:text-[15px] 2xl:text-[20px] text-[#19FB9B]">
+                            Created
+                        </h1>
+                        <h1 className="md:text-[20px] 2xl:text-[25px] pt-[16px]">
+                            {timeDiff(token.timestamp)}
+                        </h1>
+                    </div>
                 </div>
 
                 <div className="flex flex-col gap-6 ">
@@ -56,96 +152,6 @@ export default function HighlightProject({
                             {token.symbol}
                         </h1>
                         {/* project socials */}
-                        <div className="flex gap-2 items-center">
-                            {token.link?.website && (
-                                <Link href={token.link.website} target="_blank">
-                                    <div className="overflow-hidden border border-[#334155] rounded-[5px] py-2 px-3">
-                                        <div className="w-[24px] h-[24px] relative">
-                                            <Image
-                                                src="/icons/web2.svg"
-                                                alt="website"
-                                                fill
-                                                sizes="any"
-                                            />
-                                        </div>
-                                    </div>
-                                </Link>
-                            )}
-                            {token.link?.telegram && (
-                                <Link
-                                    href={token.link.telegram}
-                                    target="_blank"
-                                >
-                                    <div className="overflow-hidden border border-[#334155] rounded-[5px] py-2 px-3">
-                                        <div className="w-[24px] h-[24px] relative">
-                                            <Image
-                                                src="/icons/telegram.svg"
-                                                alt="telegram"
-                                                fill
-                                                sizes="any"
-                                            />
-                                        </div>
-                                    </div>
-                                </Link>
-                            )}
-                            {token.link?.twitter && (
-                                <Link href={token.link.twitter} target="_blank">
-                                    <div className="overflow-hidden border border-[#334155] rounded-[5px] py-2 px-3">
-                                        <div className="w-[24px] h-[24px] relative">
-                                            <Image
-                                                src="/icons/twitter.svg"
-                                                alt="twitter"
-                                                fill
-                                                sizes="any"
-                                            />
-                                        </div>
-                                    </div>
-                                </Link>
-                            )}
-                            {token.link?.discord && (
-                                <Link href={token.link.discord} target="_blank">
-                                    <div className="overflow-hidden border border-[#334155] rounded-[5px] py-2 px-3">
-                                        <div className="w-[24px] h-[24px] relative">
-                                            <Image
-                                                src="/icons/medium.svg"
-                                                alt="medium"
-                                                fill
-                                                sizes="any"
-                                            />
-                                        </div>
-                                    </div>
-                                </Link>
-                            )}
-
-                            {token.link?.link1 && (
-                                <Link href={token.link.link1} target="_blank">
-                                    <div className="overflow-hidden border border-[#334155] rounded-[5px] py-2 px-3">
-                                        <div className="w-[24px] h-[24px] relative">
-                                            <Image
-                                                src="/icons/web2.svg"
-                                                alt="website"
-                                                fill
-                                                sizes="any"
-                                            />
-                                        </div>
-                                    </div>
-                                </Link>
-                            )}
-                            {token.link?.link2 && (
-                                <Link href={token.link.link2} target="_blank">
-                                    <div className="overflow-hidden border border-[#334155] rounded-[5px] py-2 px-3">
-                                        <div className="w-[24px] h-[24px] relative">
-                                            <Image
-                                                src="/icons/web2.svg"
-                                                alt="website"
-                                                fill
-                                                sizes="any"
-                                            />
-                                        </div>
-                                    </div>
-                                </Link>
-                            )}
-                        </div>
                     </div>
 
                     <div className="flex items-start gap-10">
