@@ -282,18 +282,18 @@ export default function TokenDetailPage({
         if (!publicKey || !chatInput || !data) return;
 
         try {
-            const encodedMessage = new TextEncoder().encode(
-                `${chatInput}${params.id}`
-            );
-            const signedMessage = await signMessage?.(encodedMessage);
-            const signature = base58.encode(signedMessage as Uint8Array);
+            // const encodedMessage = new TextEncoder().encode(
+            //     `${chatInput}${params.id}`
+            // );
+            // const signedMessage = await signMessage?.(encodedMessage);
+            // const signature = base58.encode(signedMessage as Uint8Array);
 
             const res = await axios.post<IComment>(
                 `${process.env.NEXT_PUBLIC_API}/bond/tokens/${params.id}/comments`,
                 {
                     user: publicKey.toString(),
                     content: chatInput,
-                    signature,
+                    // signature,
                 }
             );
 
